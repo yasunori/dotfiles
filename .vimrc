@@ -1,3 +1,4 @@
+
 "---------------------------------------------------------------------------
 " バッファ切り替え時に、バッファを自動的にファイルに保存する
 "set autowrite
@@ -107,3 +108,10 @@ au BufNewFile,BufRead *.txt set textwidth=76
 augroup END
 
 set viminfo='20,\"500,:20,%,n~/.viminfo 
+
+
+" vandle
+set rtp+=~/.vim/vundle.git/
+call vundle#rc()
+
+Bundle 'rails.vim'
