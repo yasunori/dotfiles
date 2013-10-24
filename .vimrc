@@ -1,14 +1,7 @@
-
-"---------------------------------------------------------------------------
 " バッファ切り替え時に、バッファを自動的にファイルに保存する
 "set autowrite
 " バックアップファイルを作成しない
 set nobackup
-"set backup
-
-"set ambiwidth=double
-
-set ruler
 
 "migemoつかう。要migemo.
 "set migemo
@@ -19,28 +12,24 @@ set ruler
 "バッファ切り替え時にUNDO消さない。あと保存しなくてよくする。
 "注意！
 set hidden
-" スラッシュをフォルダ区切りに
+"スラッシュをフォルダ区切りに
 set shellslash
-" ファイルのタブの幅
+"ファイルのタブの幅
 set tabstop=4
-" 編集中でのタブの幅
+"編集中でのタブの幅
 set softtabstop=4
-" インデントの幅
-set shiftwidth=2
+"インデントの幅
+set shiftwidth=4
+"タブをスペースに展開
+set expandtab
 
+"行番号出す
 set number
 
-"タブを明示的に
-"set list
-"set listchars=tab:\|>,eol:<
-
-"拡張子で_vimrcを読み直す
-"set fexrc
-
-"キーマッピングバッファ編
-map <LEFT> <ESC>:bp<CR>
-map <RIGHT> <ESC>:bn<CR>
-map <UP> <ESC>:ls<CR>
+"キーマッピングバッファ編 -> uniteに任せる？
+"map <LEFT> <ESC>:bp<CR>
+"map <RIGHT> <ESC>:bn<CR>
+"map <UP> <ESC>:ls<CR>
 
 "キーマッピングタブ編
 "map <C-r> <ESC>:set expandtab<CR>:retab<CR>
@@ -57,6 +46,12 @@ set clipboard+=unnamed
 
 nnoremap j gj
 nnoremap k gk
+
+" CTRL-hjklでウィンドウ移動
+nnoremap <C-j> <C-w>j
+nnoremap <C-k> <C-w>k
+nnoremap <C-l> <C-w>l
+nnoremap <C-h> <C-w>h
 
 "コマンドラインで、カレントディレクトリを入れよう
 "C-xで入れられる
@@ -77,41 +72,117 @@ let format_allow_over_tw = 2
 "折り返した時のマージン
 "set wrapmargin=1
 
-""""
-" VSTreeExplorer　要VSTreeExplorer
-let g:treeExplVertical=1
-let g:treeExplWinSize=40
+set t_Co=256
+
+if has('gui_macvim')
+    set showtabline=2 " タブを常に表示
+    set imdisable " IMを無効化
+    set transparency=10 " 透明度を指定
+    set antialias
+    set guifont=Monaco:h14
+    colorscheme macvim
+endif
 
 
-"その他モード作成
-"augroup filetypedetect
-au BufNewFile,BufRead *.* set noexpandtab
-" ファイルのタブの幅
-au BufNewFile,BufRead *.* set tabstop=4
-" 編集中でのタブの幅
-au BufNewFile,BufRead *.* set softtabstop=0
-" インデントの幅
-au BufNewFile,BufRead *.* set shiftwidth=4
-au BufNewFile,BufRead *.* set textwidth=0
-augroup END
+"if has("gui_running")
+"  set fuoptions=maxvert,maxhorz
+"  au GUIEnter * set fullscreen
+"endif
 
-"txtモード作成
-augroup filetypedetect
-au BufNewFile,BufRead *.txt set expandtab
-" ファイルのタブの幅
-au BufNewFile,BufRead *.txt set tabstop=2
-" 編集中でのタブの幅
-au BufNewFile,BufRead *.txt set softtabstop=0
-" インデントの幅
-au BufNewFile,BufRead *.txt set shiftwidth=2
-au BufNewFile,BufRead *.txt set textwidth=76
-augroup END
+colorscheme molokai
 
-set viminfo='20,\"500,:20,%,n~/.viminfo 
+" python (効かないな……
+"let $PYTHON_DLL="/Users/yasunori/.pythonbrew/pythons/Python-3.3.0/Frameworks/Python.framework/Versions/3.3/lib/libpython3.3.dylib"
+"let $PYTHON3_DLL="/Users/yasunori/.pythonbrew/pythons/Python-3.3.0/Frameworks/Python.framework/Versions/3.3/lib/libpython3.3.dylib"
 
 
-" vandle
-set rtp+=~/.vim/vundle.git/
-call vundle#rc()
+" スクリプト直接実行
+function! s:Exec()
+  exe "!" . &ft . " %"        
+:endfunction         
+command! Exec call <SID>Exec() 
+map <silent> <C-P> :call <SID>Exec()<CR>
 
-Bundle 'rails.vim'
+
+"""""""""""""""""""""""""""""""""""
+" neobundle
+"""""""""""""""""""""""""""""""""""
+set nocompatible
+filetype off
+
+if has('vim_starting')
+    set runtimepath+=~/.vim/bundle/neobundle.vim
+      call neobundle#rc(expand('~/.vim/bundle'))
+    endif
+
+" ここにインストールしたいプラグインのリストを書く
+NeoBundle 'Shougo/unite.vim'
+NeoBundle 'jmcantrell/vim-virtualenv'
+NeoBundle 'davidhalter/jedi-vim'
+NeoBundle 'Shougo/neocomplete.vim'
+NeoBundle 'Yggdroot/indentLine'
+"NeoBundle 'kevinw/pyflakes-vim'
+"NeoBundle 'nvie/vim-flake8'
+NeoBundle 'The-NERD-tree'
+NeoBundle 'scrooloose/syntastic'
+
+filetype plugin on
+filetype indent on
+
+" pythonのとき、jediとneocompleteを連携
+autocmd FileType python setlocal omnifunc=jedi#completions
+let g:jedi#auto_vim_configuration = 0
+if !exists('g:neocomplete#force_omni_input_patterns')
+      let g:neocomplete#force_omni_input_patterns = {}
+endif
+let g:neocomplete#force_omni_input_patterns.python = '\h\w*\|[^. \t]\.\w*'
+
+"frake8 呼び出してpep8チェック(py3が効かないのでsyntasticでやることにした)
+"nnoremap  pep :call Flake8()
+
+"indentlineの色（効かないな)
+let g:indentLine_color_term = 200
+let g:indentLine_char = '¦'
+
+let g:jedi#popup_select_first = 0
+
+""" Unite.vim
+" 起動時にインサートモードで開始
+"let g:unite_enable_start_insert = 1
+" インサート／ノーマルどちらからでも呼び出せるようにキーマップ
+nnoremap <silent> <C-f> :<C-u>UniteWithBufferDir -buffer-name=files file<CR>
+inoremap <silent> <C-f> <ESC>:<C-u>UniteWithBufferDir -buffer-name=files file<CR>
+nnoremap <silent> <C-b> :<C-u>Unite buffer file_mru<CR>
+inoremap <silent> <C-b> <ESC>:<C-u>Unite buffer file_mru<CR>
+" バッファ一覧
+nnoremap <silent> ,ub :<C-u>Unite buffer<CR>
+" ファイル一覧
+nnoremap <silent> ,uf :<C-u>UniteWithBufferDir -buffer-name=files file<CR>
+" レジスタ一覧
+nnoremap <silent> ,ur :<C-u>Unite -buffer-name=register register<CR>
+" 最近使用したファイル一覧
+nnoremap <silent> ,um :<C-u>Unite file_mru<CR>
+" 全部乗せ
+nnoremap <silent> ,ua :<C-u>UniteWithBufferDir -buffer-name=files buffer file_mru bookmark file<CR>
+" unite.vim上でのキーマッピング
+autocmd FileType unite call s:unite_my_settings()
+function! s:unite_my_settings()
+  " 単語単位からパス単位で削除するように変更
+  imap <buffer> <C-w> <Plug>(unite_delete_backward_path)
+  " ESCキーを2回押すと終了する
+  nmap <silent><buffer> <ESC><ESC> q
+ imap <silent><buffer> <ESC><ESC> <ESC>q
+endfunction
+
+" NERDTree ntでトグル
+noremap nt :NERDTreeToggle<CR>
+
+" 引数無しのときはNERDTree起動
+let file_name = expand("%")
+if has('vim_starting') &&  file_name == ""
+    autocmd VimEnter * NERDTree ./
+endif
+
+" シンタックスチェック
+let g:syntastic_enable_signs=1
+let g:syntastic_auto_loc_list=2
