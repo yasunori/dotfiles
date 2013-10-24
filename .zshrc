@@ -169,6 +169,8 @@ case ${OSTYPE} in
         ;;
     linux*)
         #Linux用の設定
+        #自分のvim使う
+        alias vi='env LANG=ja_JP.UTF-8 /usr/local/bin/vim "$@"'
         ;;
 esac
 
