@@ -89,6 +89,7 @@ endif
 "  au GUIEnter * set fullscreen
 "endif
 
+syntax enable
 colorscheme molokai
 
 " python (効かないな……
