@@ -158,6 +158,12 @@ case ${OSTYPE} in
         #Mac用の設定
         export CLICOLOR=1
         alias ls='ls -G -F'
+
+        # tmux
+        alias tmux='tmuxx'
+        alias tm='tmuxx'
+        alias tma='tmux attach'
+        alias tml='tmux list-window'
         # pythonbrew
         [[ -s "$HOME/.pythonbrew/etc/bashrc" ]] && source "$HOME/.pythonbrew/etc/bashrc"
         # defaultでpy3の環境を読み込む
