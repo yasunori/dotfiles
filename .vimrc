@@ -133,6 +133,16 @@ NeoBundle 'scrooloose/syntastic'
 filetype plugin on
 filetype indent on
 
+" neocompleteの起動
+let g:neocomplete#enable_at_startup = 1
+let g:neocomplete#enable_smart_case = 1
+let g:neocomplete#sources#syntax#min_keyword_length = 2
+let g:neocomplete#enable_auto_close_preview=0
+" Returnキーで、選択・改行なし
+inoremap <expr><CR> pumvisible() ? neocomplete#close_popup() : "\<CR>"
+" Tabで次へ
+inoremap <expr><TAB>  pumvisible() ? "\<C-n>" : "\<TAB>"
+
 " pythonのとき、jediとneocompleteを連携
 autocmd FileType python setlocal omnifunc=jedi#completions
 let g:jedi#auto_vim_configuration = 0
@@ -190,3 +200,7 @@ endif
 " シンタックスチェック
 let g:syntastic_enable_signs=1
 let g:syntastic_auto_loc_list=2
+" 79文字のやつは許して……
+let g:syntastic_python_flake8_args = '--ignore="E501"'
+
+
