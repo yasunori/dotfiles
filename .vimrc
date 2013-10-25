@@ -5,6 +5,9 @@ set nobackup
 
 "migemoつかう。要migemo.
 "set migemo
+"
+"linuxの場合、これがないとdeleteキーきかない
+set backspace=2
 
 "ツールバーいらない
 "set guioptions-=T
