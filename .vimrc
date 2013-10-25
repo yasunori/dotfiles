@@ -142,7 +142,7 @@ let g:neocomplete#force_omni_input_patterns.python = '\h\w*\|[^. \t]\.\w*'
 "nnoremap  pep :call Flake8()
 
 "indentlineの色（効かないな)
-let g:indentLine_color_term = 200
+let g:indentLine_color_term = 239
 let g:indentLine_char = '¦'
 
 let g:jedi#popup_select_first = 0
