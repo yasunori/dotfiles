@@ -38,7 +38,7 @@ set number
 "map <C-r> <ESC>:set expandtab<CR>:retab<CR>
 
 "ヤンクとクリップボードの同期
-set clipboard+=unnamed
+set clipboard+=unnamed,autoselect
 
 "バッファのプラグイン
 "ファイルの上で d でバッファ減らし
