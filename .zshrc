@@ -167,6 +167,11 @@ case ${OSTYPE} in
         [[ -s "$HOME/.pythonbrew/etc/bashrc" ]] && source "$HOME/.pythonbrew/etc/bashrc"
         # defaultでpy3の環境を読み込む
         pybrew venv use py3
+        # nodebrew
+        if [[ -f ~/.nodebrew/nodebrew ]]; then
+            export PATH=$HOME/.nodebrew/current/bin:$PATH
+            #nodebrew use v0.8
+        fi
         # macvim使う
         alias vi='env LANG=ja_JP.UTF-8 /Applications/MacVim.app/Contents/MacOS/Vim "$@"'
         # updatedbって打ちたい
@@ -178,5 +183,7 @@ case ${OSTYPE} in
         alias vi='env LANG=ja_JP.UTF-8 /usr/local/bin/vim "$@"'
         ;;
 esac
+
+export GIT_EDITOR=vim
 
 # vim:set ft=zsh:

@@ -3,6 +3,13 @@
 " バックアップファイルを作成しない
 set nobackup
 
+" pasteモードにする
+" 補完とかはいって大変
+set paste
+
+" 記号化ける
+set ambiwidth=double
+
 "migemoつかう。要migemo.
 "set migemo
 "
@@ -129,6 +136,7 @@ NeoBundle 'Yggdroot/indentLine'
 "NeoBundle 'nvie/vim-flake8'
 NeoBundle 'The-NERD-tree'
 NeoBundle 'scrooloose/syntastic'
+NeoBundle 'vim-coffee-script'
 
 filetype plugin on
 filetype indent on
@@ -202,5 +210,11 @@ let g:syntastic_enable_signs=1
 let g:syntastic_auto_loc_list=2
 " 79文字のやつは許して……
 let g:syntastic_python_flake8_args = '--ignore="E501"'
+" angular jsの属性をエラーにしないで
+let g:syntastic_html_tidy_ignore_errors=[" proprietary attribute \"ng-"]
 
-
+" coffee
+au BufRead,BufNewFile *.coffee            set filetype=coffee
+au BufNewFile,BufReadPost *.coffee setl shiftwidth=2 expandtab
+" 保存時にコンパイル
+autocmd BufWritePost *.coffee silent CoffeeMake! -cb | cwindow | redraw!
