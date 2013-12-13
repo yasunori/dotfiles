@@ -5,7 +5,7 @@ set nobackup
 
 " pasteモードにする
 " 補完とかはいって大変
-set paste
+" set paste
 
 " 記号化ける
 set ambiwidth=double
@@ -35,6 +35,14 @@ set expandtab
 
 "行番号出す
 set number
+
+"カーソル位置を記憶
+if has("autocmd")
+    autocmd BufReadPost *
+        \ if line("'\"") > 0 && line("'\"") <= line("$") |
+        \   exe "normal g`\"" |
+        \ endif
+endif
 
 "キーマッピングバッファ編 -> uniteに任せる？
 "map <LEFT> <ESC>:bp<CR>
