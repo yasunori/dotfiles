@@ -3,6 +3,9 @@
 " バックアップファイルを作成しない
 set nobackup
 
+" swpファイルはtmpに作るよ
+set directory=/tmp
+
 " pasteモードにする
 " 補完とかはいって大変
 " set paste
@@ -113,6 +116,10 @@ colorscheme molokai
 " python (効かないな……
 "let $PYTHON_DLL="/Users/yasunori/.pythonbrew/pythons/Python-3.3.0/Frameworks/Python.framework/Versions/3.3/lib/libpython3.3.dylib"
 "let $PYTHON3_DLL="/Users/yasunori/.pythonbrew/pythons/Python-3.3.0/Frameworks/Python.framework/Versions/3.3/lib/libpython3.3.dylib"
+"let $PYTHON_DLL="/usr/local/Cellar/python3/3.3.2/Frameworks/Python.framework/Versions/3.3/Python"
+"let $PYTHON3_DLL="/usr/local/Cellar/python3/3.3.3/Frameworks/Python.framework/Versions/3.3/lib/libpython3.3.dylib"
+"let $PYTHON3_DLL="/usr/local/Cellar/python3/3.3.3/Frameworks/Python.framework/Versions/3.3/Python"
+"let $PYTHON3_DLL="/usr/local/Cellar/python3/3.3.3/Frameworks/Python.framework/Versions/3.3/lib/libpython3.3.dylib"
 
 
 " スクリプト直接実行
@@ -214,12 +221,15 @@ if has('vim_starting') &&  file_name == ""
 endif
 
 " シンタックスチェック
+let g:syntastic_check_on_open = 1
 let g:syntastic_enable_signs=1
 let g:syntastic_auto_loc_list=2
 " 79文字のやつは許して……
 let g:syntastic_python_flake8_args = '--ignore="E501"'
 " angular jsの属性をエラーにしないで
 let g:syntastic_html_tidy_ignore_errors=[" proprietary attribute \"ng-"]
+" phpはこれ書かないと動かない？
+let g:syntastic_php_php_args = '-l'
 
 " coffee
 au BufRead,BufNewFile *.coffee            set filetype=coffee
