@@ -149,41 +149,77 @@ elif which putclip >/dev/null 2>&1 ; then
 fi
 
 
+########################################
+# 共通のツール設定
+
+# rvm があれば
+if [[ -e $HOME/.rvm ]]; then
+    [[ -s "$HOME/.rvm/scripts/rvm" ]] && source "$HOME/.rvm/scripts/rvm" # Load RVM into a shell session *as a function*
+    export PATH=$PATH:$HOME/.rvm/bin # Add RVM to PATH for scripting
+fi
+
+# tmuxinator があれば
+if [[ -e ~/.tmuxinator ]]; then
+    [[ -s $HOME/.tmuxinator/scripts/tmuxinator ]] && source $HOME/.tmuxinator/scripts/tmuxinator
+    export EDITOR=vi
+fi
+
+# nodebrew があれば
+if [[ -e ~/.nodebrew/nodebrew ]]; then
+    export PATH=$HOME/.nodebrew/current/bin:$PATH
+fi
+
+
 
 ########################################
-# OS 別の設定
+# OS 別の個別設定
 case ${OSTYPE} in
     darwin*)
         #Mac用の設定
         export CLICOLOR=1
         alias ls='ls -G -F'
 
+        # macvim使う
+        alias vi='env LANG=ja_JP.UTF-8 /Applications/MacVim.app/Contents/MacOS/Vim "$@"'
+        alias vim='env LANG=ja_JP.UTF-8 /Applications/MacVim.app/Contents/MacOS/Vim "$@"'
+
         # tmux
-        alias tmux='tmuxx'
+        #alias tmux='tmuxx'
         alias tm='tmuxx'
         alias tma='tmux attach'
         alias tml='tmux list-window'
-        # pythonbrew
-        [[ -s "$HOME/.pythonbrew/etc/bashrc" ]] && source "$HOME/.pythonbrew/etc/bashrc"
-        # defaultでpy3の環境を読み込む
-        pybrew venv use py3
-        # nodebrew
-        if [[ -f ~/.nodebrew/nodebrew ]]; then
-            export PATH=$HOME/.nodebrew/current/bin:$PATH
-            #nodebrew use v0.8
-        fi
-        # macvim使う
-        alias vi='env LANG=ja_JP.UTF-8 /Applications/MacVim.app/Contents/MacOS/Vim "$@"'
+
+        # python
+        export PATH=$HOME/.python/py3/bin:$PATH
+        export WORKON_HOME=$HOME/venvs
+        source ~/.python/py3/bin/virtualenvwrapper.sh
+
+        # rvm
+        rvm use 2.0.0
+
+        # node
+        #nodebrew use v0.8
+
+        # postgres
+        export PGDATA=/usr/local/var/postgres
+
+
+        # git
+        export GIT_EDITOR=/Applications/MacVim.app/Contents/MacOS/Vim
+
         # updatedbって打ちたい
         alias updatedb='sudo /usr/libexec/locate.updatedb'
+
         ;;
     linux*)
         #Linux用の設定
         #自分のvim使う
         alias vi='env LANG=ja_JP.UTF-8 /usr/local/bin/vim "$@"'
+
+        # GIT
+        export GIT_EDITOR=/user/local/bin/vim
         ;;
 esac
 
-export GIT_EDITOR=vim
-
 # vim:set ft=zsh:
+
