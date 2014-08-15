@@ -141,8 +141,10 @@ if has('vim_starting')
       call neobundle#rc(expand('~/.vim/bundle'))
     endif
 
+let g:neobundle_default_git_protocol='git'
 " ここにインストールしたいプラグインのリストを書く
 NeoBundle 'Shougo/unite.vim'
+NeoBundle 'Shougo/neomru.vim'
 NeoBundle 'jmcantrell/vim-virtualenv'
 NeoBundle 'davidhalter/jedi-vim'
 NeoBundle 'Shougo/neocomplete.vim'
@@ -152,6 +154,7 @@ NeoBundle 'Yggdroot/indentLine'
 NeoBundle 'The-NERD-tree'
 NeoBundle 'scrooloose/syntastic'
 NeoBundle 'vim-coffee-script'
+NeoBundle 'othree/eregex.vim'
 
 filetype plugin on
 filetype indent on

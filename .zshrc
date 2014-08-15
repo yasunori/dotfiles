@@ -110,6 +110,9 @@ setopt auto_menu
 # 高機能なワイルドカード展開を使用する
 setopt extended_glob
 
+# * ワイルドカードが使えないのとかの対応
+setopt nonomatch
+
 ########################################
 # キーバインド
 
