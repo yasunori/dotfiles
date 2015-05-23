@@ -113,6 +113,20 @@ endif
 syntax enable
 colorscheme molokai
 
+" 背景使いたいよ〜
+if !has('gui_running')
+    augroup seiya
+        autocmd!
+        autocmd VimEnter,ColorScheme * highlight Normal ctermbg=none
+        autocmd VimEnter,ColorScheme * highlight LineNr ctermbg=none
+        autocmd VimEnter,ColorScheme * highlight SignColumn ctermbg=none
+        autocmd VimEnter,ColorScheme * highlight VertSplit ctermbg=none
+        autocmd VimEnter,ColorScheme * highlight NonText ctermbg=none
+    augroup END 
+endif
+
+
+
 " python (効かないな……
 "let $PYTHON_DLL="/Users/yasunori/.pythonbrew/pythons/Python-3.3.0/Frameworks/Python.framework/Versions/3.3/lib/libpython3.3.dylib"
 "let $PYTHON3_DLL="/Users/yasunori/.pythonbrew/pythons/Python-3.3.0/Frameworks/Python.framework/Versions/3.3/lib/libpython3.3.dylib"
@@ -138,11 +152,14 @@ filetype off
 
 if has('vim_starting')
     set runtimepath+=~/.vim/bundle/neobundle.vim
-      call neobundle#rc(expand('~/.vim/bundle'))
+      call neobundle#begin(expand('~/.vim/bundle/'))
+      NeoBundleFetch 'Shougo/neobundle.vim'
+      call neobundle#end()
     endif
 
 let g:neobundle_default_git_protocol='git'
 " ここにインストールしたいプラグインのリストを書く
+call neobundle#begin(expand('~/.vim/bundle/'))
 NeoBundle 'Shougo/unite.vim'
 NeoBundle 'Shougo/neomru.vim'
 NeoBundle 'jmcantrell/vim-virtualenv'
@@ -155,6 +172,7 @@ NeoBundle 'The-NERD-tree'
 NeoBundle 'scrooloose/syntastic'
 NeoBundle 'vim-coffee-script'
 NeoBundle 'othree/eregex.vim'
+call neobundle#end()
 
 filetype plugin on
 filetype indent on
