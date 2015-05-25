@@ -221,6 +221,9 @@ case ${OSTYPE} in
 
         # GIT
         export GIT_EDITOR=/user/local/bin/vim
+
+        # tmuxで256色使えない問題
+        alias tmux='tmux -2'
         ;;
 esac
 
