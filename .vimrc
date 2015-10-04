@@ -152,20 +152,29 @@ filetype off
 
 if has('vim_starting')
     set runtimepath+=~/.vim/bundle/neobundle.vim
-      call neobundle#begin(expand('~/.vim/bundle/'))
-      NeoBundleFetch 'Shougo/neobundle.vim'
-      call neobundle#end()
-    endif
+    call neobundle#begin(expand('~/.vim/bundle/'))
+    NeoBundleFetch 'Shougo/neobundle.vim'
+    call neobundle#end()
+endif
 
 let g:neobundle_default_git_protocol='git'
 " ここにインストールしたいプラグインのリストを書く
 call neobundle#begin(expand('~/.vim/bundle/'))
+NeoBundle 'nathanaelkane/vim-indent-guides'
+"NeoBundle 'Yggdroot/indentLine'
 NeoBundle 'Shougo/unite.vim'
+NeoBundle 'Shougo/vimproc', {
+  \ 'build' : {
+    \ 'windows' : 'make -f make_mingw32.mak',
+    \ 'cygwin' : 'make -f make_cygwin.mak',
+    \ 'mac' : 'make -f make_mac.mak',
+    \ 'unix' : 'make -f make_unix.mak',
+  \ },
+  \ }
 NeoBundle 'Shougo/neomru.vim'
 NeoBundle 'jmcantrell/vim-virtualenv'
 NeoBundle 'davidhalter/jedi-vim'
 NeoBundle 'Shougo/neocomplete.vim'
-NeoBundle 'Yggdroot/indentLine'
 "NeoBundle 'kevinw/pyflakes-vim'
 "NeoBundle 'nvie/vim-flake8'
 NeoBundle 'The-NERD-tree'
@@ -191,7 +200,7 @@ inoremap <expr><TAB>  pumvisible() ? "\<C-n>" : "\<TAB>"
 autocmd FileType python setlocal omnifunc=jedi#completions
 let g:jedi#auto_vim_configuration = 0
 if !exists('g:neocomplete#force_omni_input_patterns')
-      let g:neocomplete#force_omni_input_patterns = {}
+    let g:neocomplete#force_omni_input_patterns = {}
 endif
 let g:neocomplete#force_omni_input_patterns.python = '\h\w*\|[^. \t]\.\w*'
 
@@ -199,19 +208,35 @@ let g:neocomplete#force_omni_input_patterns.python = '\h\w*\|[^. \t]\.\w*'
 "nnoremap  pep :call Flake8()
 
 "indentlineの色（効かないな)
-let g:indentLine_color_term = 239
-let g:indentLine_char = '¦'
+"let g:indentLine_enabled = 1
+"let g:indentLine_color_term = 239
+"let g:indentLine_char = '¦'
 
 let g:jedi#popup_select_first = 0
 
+" ubuntuローカルでindentlineがきかないので乗り換えた！
+let g:indent_guides_enable_on_vim_startup = 1
+let g:indent_guides_start_level = 2
+let g:indent_guides_guide_size = 1
+let g:indent_guides_auto_colors=0
+autocmd VimEnter,Colorscheme * :hi IndentGuidesOdd  ctermbg=234
+autocmd VimEnter,Colorscheme * :hi IndentGuidesEven ctermbg=236
+"let g:indent_guides_color_change_percent = 30
+let g:indent_guides_exclude_filetypes = ['help', 'nerdtree', 'tagbar', 'unite']
+
 """ Unite.vim
 " 起動時にインサートモードで開始
-"let g:unite_enable_start_insert = 1
+let g:unite_enable_start_insert = 1
+
+" 大文字小文字区別つけない
+let g:unite_enable_ignore_case = 1
+let g:unite_enable_smart_case = 1
+
 " インサート／ノーマルどちらからでも呼び出せるようにキーマップ
-nnoremap <silent> <C-f> :<C-u>UniteWithBufferDir -buffer-name=files file<CR>
-inoremap <silent> <C-f> <ESC>:<C-u>UniteWithBufferDir -buffer-name=files file<CR>
-nnoremap <silent> <C-b> :<C-u>Unite buffer file_mru<CR>
-inoremap <silent> <C-b> <ESC>:<C-u>Unite buffer file_mru<CR>
+"nnoremap <silent> <C-f> :<C-u>UniteWithBufferDir -buffer-name=files file<CR>
+"inoremap <silent> <C-f> <ESC>:<C-u>UniteWithBufferDir -buffer-name=files file<CR>
+"nnoremap <silent> <C-b> :<C-u>Unite buffer file_mru<CR>
+"inoremap <silent> <C-b> <ESC>:<C-u>Unite buffer file_mru<CR>
 " バッファ一覧
 nnoremap <silent> ,ub :<C-u>Unite buffer<CR>
 " ファイル一覧
@@ -232,6 +257,18 @@ function! s:unite_my_settings()
  imap <silent><buffer> <ESC><ESC> <ESC>q
 endfunction
 
+" unite grep
+nnoremap <silent> ,ug  :<C-u>Unite grep:. -buffer-name=search-buffer<CR>
+" カーソル位置の単語をgrep検索
+nnoremap <silent> ,ucg :<C-u>Unite grep:. -buffer-name=search-buffer<CR><C-R><C-W>
+" grep検索結果の再呼出
+nnoremap <silent> ,ugr  :<C-u>UniteResume search-buffer<CR>
+if executable('ag')
+  let g:unite_source_grep_command = 'ag'
+  let g:unite_source_grep_default_opts = '--nogroup --nocolor --column'
+  let g:unite_source_grep_recursive_opt = ''
+endif
+
 " NERDTree ntでトグル
 noremap nt :NERDTreeToggle<CR>
 
@@ -240,6 +277,9 @@ let file_name = expand("%")
 if has('vim_starting') &&  file_name == ""
     autocmd VimEnter * NERDTree ./
 endif
+
+" 隠しファイルも表示
+let NERDTreeShowHidden = 1
 
 " シンタックスチェック
 let g:syntastic_check_on_open = 1

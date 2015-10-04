@@ -161,6 +161,13 @@ if [[ -e $HOME/.rvm ]]; then
     export PATH=$PATH:$HOME/.rvm/bin # Add RVM to PATH for scripting
 fi
 
+
+# rbenv があれば
+if [[ -e $HOME/.rbenv ]]; then
+    export PATH="$HOME/.rbenv/bin:$PATH"
+    eval "$(rbenv init - zsh)"
+fi
+
 # tmuxinator があれば
 if [[ -e ~/.tmuxinator ]]; then
     [[ -s $HOME/.tmuxinator/scripts/tmuxinator ]] && source $HOME/.tmuxinator/scripts/tmuxinator
@@ -219,8 +226,13 @@ case ${OSTYPE} in
         #自分のvim使う
         alias vi='env LANG=ja_JP.UTF-8 /usr/local/bin/vim "$@"'
 
+        # python
+        export PATH=$HOME/.python/py3.5.0/bin:$PATH
+        export WORKON_HOME=$HOME/venvs
+        source ~/.python/py3.5.0/bin/virtualenvwrapper.sh
+
         # GIT
-        export GIT_EDITOR=/user/local/bin/vim
+        export GIT_EDITOR=/usr/local/bin/vim
 
         # tmuxで256色使えない問題
         alias tmux='tmux -2'
