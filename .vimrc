@@ -233,10 +233,10 @@ let g:unite_enable_ignore_case = 1
 let g:unite_enable_smart_case = 1
 
 " インサート／ノーマルどちらからでも呼び出せるようにキーマップ
-"nnoremap <silent> <C-f> :<C-u>UniteWithBufferDir -buffer-name=files file<CR>
-"inoremap <silent> <C-f> <ESC>:<C-u>UniteWithBufferDir -buffer-name=files file<CR>
-"nnoremap <silent> <C-b> :<C-u>Unite buffer file_mru<CR>
-"inoremap <silent> <C-b> <ESC>:<C-u>Unite buffer file_mru<CR>
+nnoremap <silent> <C-f> :<C-u>UniteWithBufferDir -buffer-name=files file<CR>
+inoremap <silent> <C-f> <ESC>:<C-u>UniteWithBufferDir -buffer-name=files file<CR>
+nnoremap <silent> <C-b> :<C-u>Unite buffer file_mru<CR>
+inoremap <silent> <C-b> <ESC>:<C-u>Unite buffer file_mru<CR>
 " バッファ一覧
 nnoremap <silent> ,ub :<C-u>Unite buffer<CR>
 " ファイル一覧
