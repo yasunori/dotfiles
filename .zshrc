@@ -1,4 +1,4 @@
-########################################
+#######################################1
 # 環境変数
 export LANG=ja_JP.UTF-8
 
@@ -151,6 +151,9 @@ elif which putclip >/dev/null 2>&1 ; then
     alias -g C='| putclip'
 fi
 
+# neovim等のために、configを設定する
+export XDG_CONFIG_HOME="$HOME/.config"
+
 
 ########################################
 # 共通のツール設定
@@ -177,6 +180,12 @@ fi
 # nodebrew があれば
 if [[ -e ~/.nodebrew/nodebrew ]]; then
     export PATH=$HOME/.nodebrew/current/bin:$PATH
+fi
+
+# gems があれば
+if [[ -e ~/extlib/gems ]]; then
+    export GEM_HOME=~/extlib/gems
+    export PATH=$PATH:/extlib/gems/bin/
 fi
 
 
@@ -224,20 +233,67 @@ case ${OSTYPE} in
     linux*)
         #Linux用の設定
         #自分のvim使う
-        alias vi='env LANG=ja_JP.UTF-8 /usr/local/bin/vim "$@"'
+        alias vi='env LANG=ja_JP.UTF-8 $HOME/.linuxbrew/bin/nvim "$@"'
+
+        # linuxbrew
+        if [[ -e ~/.linuxbrew ]]; then
+            export PATH=$HOME/.linuxbrew/bin:$HOME/.linuxbrew/sbin:$PATH
+        fi
 
         # python
-        export PATH=$HOME/.python/py3.5.0/bin:$PATH
+        export PATH=$HOME/.python/current/bin:$PATH
         export WORKON_HOME=$HOME/venvs
-        source ~/.python/py3.5.0/bin/virtualenvwrapper.sh
+        source ~/.python/current/bin/virtualenvwrapper.sh
 
         # GIT
-        export GIT_EDITOR=/usr/local/bin/vim
+        export GIT_EDITOR=$HOME/.linuxbrew/bin/nvim
 
         # tmuxで256色使えない問題
         alias tmux='tmux -2'
+
+        # zplug
+        export ZPLUG_HOME=/home/yasunori/.linuxbrew/opt/zplug
+        source $ZPLUG_HOME/init.zsh
+
         ;;
 esac
 
 # vim:set ft=zsh:
 
+
+# zplug
+if [ ! ${ZPLUG_HOME:-default} = "default" ]; then
+    zplug "junegunn/fzf-bin", as:command, from:gh-r, rename-to:fzf
+
+
+    # 未インストール項目をインストールする
+    if ! zplug check --verbose; then
+        printf "Install? [y/N]: "
+        if read -q; then
+            echo; zplug install
+        fi
+    fi
+
+    # コマンドをリンクして、PATH に追加し、プラグインは読み込む
+    zplug load --verbose
+fi
+
+
+# tmux
+if [[ ! -n $TMUX && $- == *l* ]]; then
+    # get the IDs
+    ID="`tmux list-sessions`"
+    if [[ -z "$ID" ]]; then
+        tmux new-session
+    fi
+    create_new_session="Create New Session"
+    ID="$ID\n${create_new_session}:"
+    ID="`echo $ID | $PERCOL | cut -d: -f1`"
+    if [[ "$ID" = "${create_new_session}" ]]; then
+        tmux new-session
+    elif [[ -n "$ID" ]]; then
+        tmux attach-session -t "$ID"
+    else
+        :  # Start terminal normally
+    fi
+fi

@@ -11,7 +11,7 @@ set directory=/tmp
 " set paste
 
 " 記号化ける
-set ambiwidth=double
+"set ambiwidth=double
 
 "migemoつかう。要migemo.
 "set migemo
@@ -293,7 +293,7 @@ let g:syntastic_html_tidy_ignore_errors=[" proprietary attribute \"ng-"]
 let g:syntastic_php_php_args = '-l'
 
 " coffee
-au BufRead,BufNewFile *.coffee            set filetype=coffee
-au BufNewFile,BufReadPost *.coffee setl shiftwidth=2 expandtab
+"au BufRead,BufNewFile *.coffee            set filetype=coffee
+"au BufNewFile,BufReadPost *.coffee setl shiftwidth=2 expandtab
 " 保存時にコンパイル
-autocmd BufWritePost *.coffee silent CoffeeMake! -cb | cwindow | redraw!
+"autocmd BufWritePost *.coffee silent CoffeeMake! -cb | cwindow | redraw!
