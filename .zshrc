@@ -255,6 +255,13 @@ case ${OSTYPE} in
         export ZPLUG_HOME=/home/yasunori/.linuxbrew/opt/zplug
         source $ZPLUG_HOME/init.zsh
 
+        #fzf
+        PERCOL='fzf'
+
+        #tmuximum
+        alias t="tmuximum"
+
+
         ;;
 esac
 
@@ -264,6 +271,8 @@ esac
 # zplug
 if [ ! ${ZPLUG_HOME:-default} = "default" ]; then
     zplug "junegunn/fzf-bin", as:command, from:gh-r, rename-to:fzf
+    zplug "arks22/tmuximum", as:command
+    zplug 'zsh-users/zsh-autosuggestions'
 
 
     # 未インストール項目をインストールする
@@ -278,22 +287,14 @@ if [ ! ${ZPLUG_HOME:-default} = "default" ]; then
     zplug load --verbose
 fi
 
+# zplug後に必要な設定
 
-# tmux
+# autosuggestionsの色
+ZSH_AUTOSUGGEST_HIGHLIGHT_STYLE='fg=242'
+
+
+## 最後
+# tmuxを自動起動。体裁はtmuximumに任せた
 if [[ ! -n $TMUX && $- == *l* ]]; then
-    # get the IDs
-    ID="`tmux list-sessions`"
-    if [[ -z "$ID" ]]; then
-        tmux new-session
-    fi
-    create_new_session="Create New Session"
-    ID="$ID\n${create_new_session}:"
-    ID="`echo $ID | $PERCOL | cut -d: -f1`"
-    if [[ "$ID" = "${create_new_session}" ]]; then
-        tmux new-session
-    elif [[ -n "$ID" ]]; then
-        tmux attach-session -t "$ID"
-    else
-        :  # Start terminal normally
-    fi
+    tmuximum
 fi

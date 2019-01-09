@@ -50,10 +50,14 @@ set backspace=2
 set hidden
 "スラッシュをフォルダ区切りに
 set shellslash
-"ファイルのタブの幅
+
+" 基本のタブ設定
 set tabstop=4
-"編集中でのタブの幅
-set softtabstop=4
+set shiftwidth=0
+set expandtab
+
+autocmd FileType python setlocal tabstop=4 shiftwidth=0 expandtab
+
 
 "行番号出す
 set number
