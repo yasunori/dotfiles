@@ -32,21 +32,21 @@ repo = 'jacoborus/tender.vim'
 repo = 'Shougo/denite.nvim'
 hook_add = '''
     "ESCキーでdeniteを終了
-    call denite#custom#map('insert', '<esc>', '<denite:enter_mode:normal>', 'noremap')
-    call denite#custom#map('normal', '<esc>', '<denite:quit>', 'noremap')
+    "call denite#custom#map('insert', '<esc>', '<denite:enter_mode:normal>', 'noremap')
+    "call denite#custom#map('normal', '<esc>', '<denite:quit>', 'noremap')
 
     "一番利用する、最近使ったファイル
-    noremap <C-B> :Denite buffer file_mru<CR>
-    inoremap <C-B> <ESC>:Denite buffer file_mru<CR>
+    noremap <C-B> :Denite -mode=normal buffer file_mru<CR>
+    inoremap <C-B> <ESC>:Denite -mode=normal buffer file_mru<CR>
 
     "バッファ一覧
-    noremap <,ub> :Denite buffer<CR>
+    noremap <,ub> :Denite -mode=normal buffer<CR>
 
     "最近使ったファイルの一覧
-    noremap <,um> :Denite buffer<CR>
+    noremap <,um> :Denite -mode=normal buffer<CR>
 
     "カレントディレクトリ
-    noremap <,uf> :DeniteBufferDir file_rec<CR>
+    noremap <,uf> :DeniteBufferDir -mode=normal file_rec<CR>
 
     "バッファ一覧
 
@@ -62,6 +62,7 @@ hook_add = '''
         autocmd VimEnter * NERDTree ./
     endif
 	let NERDTreeShowHidden = 1
+    let g:NERDTreeWinSize=26
 '''
 
 # Indent Guides
