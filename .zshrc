@@ -2,6 +2,8 @@
 # 環境変数
 export LANG=ja_JP.UTF-8
 
+# 256色使えるように
+export TERM="xterm-256color"
 
 # 色を使用出来るようにする
 autoload -Uz colors
@@ -247,6 +249,7 @@ case ${OSTYPE} in
 
         # GIT
         export GIT_EDITOR=$HOME/.linuxbrew/bin/nvim
+
 
         # tmuxで256色使えない問題
         alias tmux='tmux -2'
