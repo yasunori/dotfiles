@@ -160,6 +160,22 @@ export XDG_CONFIG_HOME="$HOME/.config"
 ########################################
 # 共通のツール設定
 
+# python
+if [[ -e ~/.python/current ]]; then
+    export PATH=$HOME/.python/current/bin:$PATH
+    export WORKON_HOME=$HOME/venvs
+fi
+if [[ -e ~/.python/current/bin/virtualenvwrapper.sh ]]; then
+    source ~/.python/current/bin/virtualenvwrapper.sh
+fi
+
+
+# nodebrew があれば
+if [[ -e ~/.nodebrew ]]; then
+    export PATH=$HOME/.nodebrew/current/bin:$PATH
+fi
+
+
 # rvm があれば
 if [[ -e $HOME/.rvm ]]; then
     [[ -s "$HOME/.rvm/scripts/rvm" ]] && source "$HOME/.rvm/scripts/rvm" # Load RVM into a shell session *as a function*
@@ -173,16 +189,13 @@ if [[ -e $HOME/.rbenv ]]; then
     eval "$(rbenv init - zsh)"
 fi
 
+
 # tmuxinator があれば
 if [[ -e ~/.tmuxinator ]]; then
     [[ -s $HOME/.tmuxinator/scripts/tmuxinator ]] && source $HOME/.tmuxinator/scripts/tmuxinator
     export EDITOR=vi
 fi
 
-# nodebrew があれば
-if [[ -e ~/.nodebrew/nodebrew ]]; then
-    export PATH=$HOME/.nodebrew/current/bin:$PATH
-fi
 
 # gems があれば
 if [[ -e ~/extlib/gems ]]; then
@@ -210,10 +223,6 @@ case ${OSTYPE} in
         alias tma='tmux attach'
         alias tml='tmux list-window'
 
-        # python
-        export PATH=$HOME/.python/py3/bin:$PATH
-        export WORKON_HOME=$HOME/venvs
-        source ~/.python/py3/bin/virtualenvwrapper.sh
 
         # rvm
         rvm use 2.0.0
@@ -223,7 +232,6 @@ case ${OSTYPE} in
 
         # postgres
         export PGDATA=/usr/local/var/postgres
-
 
         # git
         export GIT_EDITOR=/Applications/MacVim.app/Contents/MacOS/Vim
@@ -242,10 +250,6 @@ case ${OSTYPE} in
             export PATH=$HOME/.linuxbrew/bin:$HOME/.linuxbrew/sbin:$PATH
         fi
 
-        # python
-        export PATH=$HOME/.python/current/bin:$PATH
-        export WORKON_HOME=$HOME/venvs
-        source ~/.python/current/bin/virtualenvwrapper.sh
 
         # GIT
         export GIT_EDITOR=$HOME/.linuxbrew/bin/nvim
@@ -255,7 +259,7 @@ case ${OSTYPE} in
         alias tmux='tmux -2'
 
         # zplug
-        export ZPLUG_HOME=/home/yasunori/.linuxbrew/opt/zplug
+        export ZPLUG_HOME=$HOME/.linuxbrew/opt/zplug
         source $ZPLUG_HOME/init.zsh
 
         #fzf
