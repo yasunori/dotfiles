@@ -34,7 +34,7 @@ set directory=/tmp
 " set paste
 
 " 記号化ける
-set ambiwidth=double
+" set ambiwidth=double
 
 "migemoつかう。要migemo.
 "set migemo
@@ -100,7 +100,7 @@ let format_join_spaces = 2
 let format_allow_over_tw = 2
 "
 
-set t_Co=256
+"set t_Co=256
 
 
 syntax enable

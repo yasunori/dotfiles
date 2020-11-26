@@ -178,7 +178,7 @@ if [[ -e ~/.tmuxinator ]]; then
 fi
 
 # nodebrew があれば
-if [[ -e ~/.nodebrew/nodebrew ]]; then
+if [[ -e ~/.nodebrew ]]; then
     export PATH=$HOME/.nodebrew/current/bin:$PATH
 fi
 
@@ -251,6 +251,9 @@ case ${OSTYPE} in
         # tmuxで256色使えない問題
         alias tmux='tmux -2'
 
+        # tmuxコマンドをtmuximumに任せたとき、tmuxで256色使えない問題が発生したので
+        export TERM=xterm-256color
+
         # zplug
         export ZPLUG_HOME=/home/yasunori/.linuxbrew/opt/zplug
         source $ZPLUG_HOME/init.zsh
@@ -260,7 +263,6 @@ case ${OSTYPE} in
 
         #tmuximum
         alias t="tmuximum"
-
 
         ;;
 esac
