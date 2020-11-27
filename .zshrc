@@ -169,12 +169,10 @@ if [[ -e ~/.python/current/bin/virtualenvwrapper.sh ]]; then
     source ~/.python/current/bin/virtualenvwrapper.sh
 fi
 
-
 # nodebrew があれば
 if [[ -e ~/.nodebrew ]]; then
     export PATH=$HOME/.nodebrew/current/bin:$PATH
 fi
-
 
 # rvm があれば
 if [[ -e $HOME/.rvm ]]; then
@@ -182,13 +180,11 @@ if [[ -e $HOME/.rvm ]]; then
     export PATH=$PATH:$HOME/.rvm/bin # Add RVM to PATH for scripting
 fi
 
-
 # rbenv があれば
 if [[ -e $HOME/.rbenv ]]; then
     export PATH="$HOME/.rbenv/bin:$PATH"
     eval "$(rbenv init - zsh)"
 fi
-
 
 # tmuxinator があれば
 if [[ -e ~/.tmuxinator ]]; then
@@ -206,6 +202,21 @@ if [[ -e ~/extlib/gems ]]; then
     export GEM_HOME=~/extlib/gems
     export PATH=$PATH:/extlib/gems/bin/
 fi
+
+# aws cliのデフォルトユーザ
+export AWS_DEFAULT_PROFILE=yasunori
+
+# インスタンス一覧
+alias list-instances="aws ec2 describe-instances --output=table --query 'Reservations[].Instances[?Platform!=\`windows\`][].{InstanceId: InstanceId, PrivateIp: join(\`, \`, NetworkInterfaces[].PrivateIpAddress), GlobalIP: join(\`, \`, NetworkInterfaces[].Association.PublicIp), Platform:Platform, State: State.Name, SecurityGroupId: join(\`, \`, SecurityGroups[].GroupId) ,Name: Tags[?Key==\`Name\`].Value|[0]}'"
+
+# インスタンス停止
+alias stop-instance="aws ec2 stop-instances --instance-ids "
+
+# インスタンス起動
+alias start-instance="aws ec2 start-instances --instance-ids "
+
+# インスタンス状態
+alias describe-instance="aws ec2 describe-instance-status --instance-ids "
 
 
 
