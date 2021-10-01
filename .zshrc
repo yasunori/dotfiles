@@ -168,6 +168,9 @@ fi
 if [[ -e ~/.python/current/bin/virtualenvwrapper.sh ]]; then
     source ~/.python/current/bin/virtualenvwrapper.sh
 fi
+if [[ -e ~/.poetry ]]; then
+    export PATH="$HOME/.poetry/bin:$PATH"
+fi
 
 # nodebrew があれば
 if [[ -e ~/.nodebrew ]]; then
