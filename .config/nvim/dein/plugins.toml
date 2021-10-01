@@ -1,52 +1,65 @@
 [[plugins]]
 repo = 'Shougo/dein.vim'
 
-[[plugins]]
+[[plugins]] # ステータスバー
 repo = 'itchyny/lightline.vim'
 hook_add = '''
     let g:lightline = {'colorscheme': 'wombat'}
 '''
 
-# vimproc
-# denite依存
-[[plugins]]
+[[plugins]] # deniteに必要
 repo = 'Shougo/vimproc.vim'
 build = 'make'
 
-# neomru
-# denite依存
-[[plugins]]
+[[plugins]] # deniteに必要
 repo = 'Shougo/neomru.vim'
 
-
-# Toml
-[[plugins]]
+[[plugins]] # tomlを表示
 repo  = 'cespare/vim-toml'
 
-# Color Scheme
-[[plugins]]
-repo = 'jacoborus/tender.vim'
+[[plugins]] # color scheme
+repo = 'jacoborus/tender'
+hook_add = '''
+  colorscheme tender
+  " colorscheme 設定は source 後に行う必要があるので VimEnter で行う。
+  " 但し Colorscheme イベントの発生が抑制されないよう nented を付ける。
+  " au MyAutoCmd VimEnter * nested colorscheme tender
+'''
 
-# Denite
-[[plugins]]
+[[plugins]] # easymotion
+repo = 'easymotion/vim-easymotion'
+
+[[plugins]] # denite
 repo = 'Shougo/denite.nvim'
 hook_add = '''
     "ESCキーでdeniteを終了
     "call denite#custom#map('insert', '<esc>', '<denite:enter_mode:normal>', 'noremap')
     "call denite#custom#map('normal', '<esc>', '<denite:quit>', 'noremap')
 
-    "一番利用する、最近使ったファイル
-    noremap <C-B> :Denite buffer file_mru<CR>
-    inoremap <C-B> <ESC>:Denite buffer file_mru<CR>
+    " file/recの除外ファイル設定
+    call denite#custom#source('file/rec', 'matchers', ['matcher_fuzzy','matcher_ignore_globs'])
+    call denite#custom#filter('matcher_ignore_globs', 'ignore_globs',
+      \ [
+      \ '.git/', 'build/', '__pycache__/', 'node_modules/', '.mypy_cache/', '.venv/',
+      \ 'images/', '*.o', '*.make',
+      \ '*.min.*',
+      \ 'img/', 'fonts/', 'tmp/'])
+
+    "バッファと最近使ったファイル
+    noremap <C-B> :DeniteProjectDir -start-filter buffer file_mru<CR>
+    inoremap <C-B> <ESC>:DeniteProjectDir -start-filter buffer file_mru<CR>
+
+    "バッファとプロジェクト内のファイル
+    noremap <C-P> :DeniteProjectDir -start-filter buffer file/rec<CR>
 
     "バッファ一覧
-    noremap <,ub> :Denite buffer<CR>
+    noremap <Leader>ub :Denite buffer<CR>
 
     "最近使ったファイルの一覧
-    noremap <,um> :Denite buffer<CR>
+    noremap <Leader>um :Denite file_mru<CR>
 
     "カレントディレクトリ
-    noremap <,uf> :DeniteBufferDir file_rec<CR>
+    noremap <Leader>uf :DeniteBufferDir file/rec<CR>
 
     "バッファ一覧
     autocmd FileType denite call s:denite_my_settings()
@@ -65,21 +78,22 @@ hook_add = '''
 
 '''
 
-# NerdTree
-[[plugins]]
+[[plugins]] # NerdTree
 repo = 'scrooloose/nerdtree'
 hook_add = '''
     noremap nt :NERDTreeToggle<CR>
     let file_name = expand("%")
-    if has('vim_starting') &&  file_name == ""
-        autocmd VimEnter * NERDTree ./
-    endif
 	let NERDTreeShowHidden = 1
     let g:NERDTreeWinSize=26
+    "if has('vim_starting') &&  file_name == ""
+    "    autocmd VimEnter * NERDTree ./
+    "endif
 '''
 
-# Indent Guides
 [[plugins]]
+repo = 'Xuyuanp/nerdtree-git-plugin'
+
+[[plugins]] # Indent Guides
 repo = 'nathanaelkane/vim-indent-guides'
 hook_add = '''
     let g:indent_guides_enable_on_vim_startup = 1
@@ -90,49 +104,49 @@ hook_add = '''
     autocmd VimEnter,Colorscheme * :hi IndentGuidesEven ctermbg=236
 '''
 
-[[plugins]]
-repo = 'autozimu/LanguageClient-neovim'
-rev = 'next'
-build = 'bash install.sh'
-hook_add = '''
-    let g:LanguageClient_serverCommands = {
-        \ 'python': ['pyls'],
-    \ }
-'''
+#[[plugins]]
+#repo = 'autozimu/LanguageClient-neovim'
+#rev = 'next'
+#build = 'bash install.sh'
+#hook_add = '''
+#    let g:LanguageClient_serverCommands = {
+#        \ 'python': ['pyls'],
+#    \ }
+#    let g:LanguageClient_useVirtualText = 0
+#    augroup LanguageClient_config
+#        autocmd!
+#        autocmd User LanguageClientStarted setlocal signcolumn=yes
+#        autocmd User LanguageClientStopped setlocal signcolumn=auto
+#    augroup END
+#'''
 
 [[plugins]]
-repo     = 'w0rp/ale'
-hook_add = '''
-"let g:ale_sign_error = '>>'
-"let g:ale_sign_warning = '--'
-" エラー行にカーソルをあわせた際に表示されるメッセージフォーマット
-let g:ale_echo_msg_format = '[%linter%] %s [%severity%]'
-" エラー表示の列を常時表示
-let g:ale_sign_column_always = 1
+repo = "neoclide/coc.nvim"
+merge = 0
+rev = "release"
+hook_add = """
+    set statusline^=%{coc#status()}
+    let g:coc_global_extensions = [
+      \ 'coc-jedi',
+      \ 'coc-json',
+      \ 'coc-tabnine',
+      \ ]
 
-" ファイルを開いたときにlint実行
-let g:ale_lint_on_enter = 1
-" ファイルを保存したときにlint実行
-let g:ale_lint_on_save = 1
-" 編集中のlintはしない
-"let g:ale_lint_on_text_changed = 'never'
+      inoremap <silent><expr> <TAB>
+      \ pumvisible() ? "\<C-n>" :
+      \ <SID>check_back_space() ? "\<TAB>" :
+      \ coc#refresh()
+    inoremap <expr><S-TAB> pumvisible() ? "\<C-p>" : "\<C-h>"
 
-" lint結果をロケーションリストとQuickFixには表示しない
-" 出てると結構うざいしQuickFixを書き換えられるのは困る
-let g:ale_set_loclist = 0
-let g:ale_set_quickfix = 0
-let g:ale_open_list = 0
-let g:ale_keep_list_window_open = 0
-" 有効にするlinter
-let g:ale_linters = {
-\   'python': ['flake8'],
-\}
-'''
+    function! s:check_back_space() abort
+      let col = col('.') - 1
+      return !col || getline('.')[col - 1]  =~# '\s'
+    endfunction
 
-[[plugins]]
+    inoremap <expr> <cr> pumvisible() ? "\<C-y>" : "\<C-g>u\<CR>"
+
+"""
+
+[[plugins]] # perl風正規表現
 repo = 'othree/eregex.vim'
 
-
-# Golang
-#[[plugins]]
-#repo = 'fatih/vim-go'

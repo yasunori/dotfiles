@@ -6,29 +6,34 @@ on_cmd = 'Dein'
 [[plugins]]
 repo = 'Shougo/context_filetype.vim'
 
-[[plugins]]
-repo = 'Shougo/neosnippet.vim'
-on_event = 'InsertCharPre'
-on_ft = 'snippet'
-depends = 'context_filetype.vim'
+[[plugins]] # カーソル位置のコンテキストに合わせてftを切り替える
+repo = 'osyo-manga/vim-precious'
+depends = ['context_filetype.vim']
 
-[[plugins]]
-repo = 'Shougo/deoplete.nvim'
-depends = 'context_filetype.vim'
-on_event = 'InsertEnter'
-hook_add = '''
-let g:deoplete#enable_at_startup = 1
-let g:deoplete#auto_complete_delay = 0
-let g:deoplete#auto_complete_start_length = 1
-let g:deoplete#enable_camel_case = 0
-let g:deoplete#enable_ignore_case = 0
-let g:deoplete#enable_refresh_always = 0
-let g:deoplete#enable_smart_case = 1
-let g:deoplete#file#enable_buffer_path = 1
-let g:deoplete#max_list = 10000
-set completeopt-=preview
-" 改行使いたい
-inoremap <expr><CR> pumvisible() ? deoplete#close_popup() : "\<CR>"
-" Tabで次へ
-inoremap <expr><TAB>  pumvisible() ? "\<C-n>" : "\<TAB>" 
-'''
+
+#[[plugins]]
+#repo = 'Shougo/neosnippet.vim'
+#on_event = 'InsertCharPre'
+#on_ft = 'snippet'
+#depends = 'context_filetype.vim'
+
+#[[plugins]]
+#repo = 'Shougo/deoplete.nvim'
+#depends = 'context_filetype.vim'
+#on_event = 'InsertEnter'
+#hook_add = '''
+#let g:deoplete#enable_at_startup = 1
+#let g:deoplete#auto_complete_delay = 0
+#let g:deoplete#auto_complete_start_length = 1
+#let g:deoplete#enable_camel_case = 0
+#let g:deoplete#enable_ignore_case = 0
+#let g:deoplete#enable_refresh_always = 0
+#let g:deoplete#enable_smart_case = 1
+#let g:deoplete#file#enable_buffer_path = 1
+#let g:deoplete#max_list = 10000
+#set completeopt-=preview
+#" 改行使いたい
+#inoremap <expr><CR> pumvisible() ? deoplete#close_popup() : "\<CR>"
+#" Tabで次へ
+#inoremap <expr><TAB>  pumvisible() ? "\<C-n>" : "\<TAB>" 
+#'''

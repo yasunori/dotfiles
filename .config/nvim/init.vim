@@ -104,7 +104,6 @@ let format_allow_over_tw = 2
 
 
 syntax enable
-colorscheme tender
 
 " leaderをspaceにしよう
 let mapleader = "\<Space>"
