@@ -106,9 +106,12 @@ let format_allow_over_tw = 2
 syntax enable
 colorscheme tender
 
+" leaderをspaceにしよう
+let mapleader = "\<Space>"
+
 " スクリプト直接実行
-function! s:Exec()
-   exe "!" . &ft . " %"
-:endfunction
-command! Exec call <SID>Exec()
-map <silent> <C-P> :call <SID>Exec()<CR>
+"function! s:Exec()
+"   exe "!" . &ft . " %"
+":endfunction
+"command! Exec call <SID>Exec()
+"map <silent> <C-P> :call <SID>Exec()<CR>
