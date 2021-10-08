@@ -3,6 +3,9 @@ augroup MyAutoCmd
     autocmd!
 augroup END
 
+" leaderをspaceにしよう
+let mapleader = "\<Space>"
+
 " ENV
 let $CACHE = empty($XDG_CACHE_HOME) ? expand('$HOME/.cache') : $XDG_CACHE_HOME
 let $CONFIG = empty($XDG_CONFIG_HOME) ? expand('$HOME/.config') : $XDG_CONFIG_HOME
@@ -105,8 +108,6 @@ let format_allow_over_tw = 2
 
 syntax enable
 
-" leaderをspaceにしよう
-let mapleader = "\<Space>"
 
 " スクリプト直接実行
 "function! s:Exec()

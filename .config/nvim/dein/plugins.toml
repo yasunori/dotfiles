@@ -32,11 +32,18 @@ repo = 'easymotion/vim-easymotion'
 [[plugins]] # denite
 repo = 'Shougo/denite.nvim'
 hook_add = '''
-    "ESCキーでdeniteを終了
+    "ESCキーでdeniteを終了（できなくなった？）
     "call denite#custom#map('insert', '<esc>', '<denite:enter_mode:normal>', 'noremap')
     "call denite#custom#map('normal', '<esc>', '<denite:quit>', 'noremap')
 
-    " file/recの除外ファイル設定
+    "rgあれば使う
+    if executable('rg')
+      call denite#custom#var('file_rec', 'command',
+        \ ['rg', '--files', '--glob', '!.git'])
+      call denite#custom#var('grep', 'command', ['rg'])
+    endif
+
+    "file/recの除外ファイル設定
     call denite#custom#source('file/rec', 'matchers', ['matcher_fuzzy','matcher_ignore_globs'])
     call denite#custom#filter('matcher_ignore_globs', 'ignore_globs',
       \ [
@@ -45,11 +52,16 @@ hook_add = '''
       \ '*.min.*',
       \ 'img/', 'fonts/', 'tmp/'])
 
-    "バッファと最近使ったファイル
-    noremap <C-B> :DeniteProjectDir -start-filter buffer file_mru<CR>
-    inoremap <C-B> <ESC>:DeniteProjectDir -start-filter buffer file_mru<CR>
+    "neomruをプロジェクト内に絞る設定
+    call denite#custom#source(
+      \ 'file_mru', 'matchers',
+      \ ['matcher_project_files', 'matcher_fuzzy'])
 
-    "バッファとプロジェクト内のファイル
+    "バッファ,最近使ったファイル,プロジェクト内のファイル全部のせ
+    noremap <C-B> :DeniteProjectDir -start-filter buffer file_mru file/rec<CR>
+    inoremap <C-B> <ESC>:DeniteProjectDir -start-filter buffer file_mru file/rec<CR>
+
+    "バッファ,プロジェクト内のファイル
     noremap <C-P> :DeniteProjectDir -start-filter buffer file/rec<CR>
 
     "バッファ一覧
@@ -60,6 +72,15 @@ hook_add = '''
 
     "カレントディレクトリ
     noremap <Leader>uf :DeniteBufferDir file/rec<CR>
+
+    " Denige grep
+    nnoremap <silent><Leader>ug :Denite grep -buffer-name=search-buffer-denite<CR>
+    " Denite grep検索結果を再表示する
+    nnoremap <silent><Leader>ugr :<C-u>Denite -resume -buffer-name=search-buffer-denite<CR>
+    " resumeした検索結果の次の行の結果へ飛ぶ
+    "nnoremap <silent><Leader>ugn :<C-u>Denite -resume -buffer-name=search-buffer-denite -select=+1 -immediately<CR>
+    " resumeした検索結果の前の行の結果へ飛ぶ
+    "nnoremap <silent><Leader>ugp :<C-u>Denite -resume -buffer-name=search-buffer-denite -select=-1 -immediately<CR>
 
     "バッファ一覧
     autocmd FileType denite call s:denite_my_settings()
