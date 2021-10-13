@@ -466,6 +466,5 @@ fi
 
 # sync HW clock
 if [ -n "$WSLENV" ]; then
-    echo "wsl"
     sudo hwclock -s
 fi
