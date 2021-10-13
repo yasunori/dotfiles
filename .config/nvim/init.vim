@@ -6,6 +6,9 @@ augroup END
 " leaderをspaceにしよう
 let mapleader = "\<Space>"
 
+" filetype検出
+filetype on
+
 " ENV
 let $CACHE = empty($XDG_CACHE_HOME) ? expand('$HOME/.cache') : $XDG_CACHE_HOME
 let $CONFIG = empty($XDG_CONFIG_HOME) ? expand('$HOME/.config') : $XDG_CONFIG_HOME
@@ -60,6 +63,7 @@ set shiftwidth=0
 set expandtab
 
 autocmd FileType python setlocal tabstop=4 shiftwidth=0 expandtab
+autocmd FileType markdown setlocal tabstop=2 shiftwidth=0 expandtab
 
 
 "行番号出す
@@ -107,6 +111,14 @@ let format_allow_over_tw = 2
 
 
 syntax enable
+
+
+" terminalにてESCでコマンドモードに戻る
+" tnoremap <silent> <ESC> <C-\><C-n>
+tnoremap <silent> <ESC> <C-\><C-n>
+
+"let g:notes_cli_select_cmd='fzf'
+"let g:notes_cli_edit_cmd=':e'
 
 
 " スクリプト直接実行

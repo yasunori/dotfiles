@@ -47,7 +47,7 @@ hook_add = '''
     call denite#custom#source('file/rec', 'matchers', ['matcher_fuzzy','matcher_ignore_globs'])
     call denite#custom#filter('matcher_ignore_globs', 'ignore_globs',
       \ [
-      \ '.git/', 'build/', '__pycache__/', 'node_modules/', '.mypy_cache/', '.venv/',
+      \ '.git/', 'build/', '__pycache__/', 'node_modules/', '.mypy_cache/', '.venv/', 'venvs/',
       \ 'images/', '*.o', '*.make',
       \ '*.min.*',
       \ 'img/', 'fonts/', 'tmp/'])
@@ -166,9 +166,29 @@ hook_add = """
     endfunction
 
     inoremap <expr> <cr> pumvisible() ? "\<C-y>" : "\<C-g>u\<CR>"
-
 """
 
-[[plugins]] # perl風正規表現
+[[plugins]] # :%S で/perl風正規表現
 repo = 'othree/eregex.vim'
 
+[[plugins]] # バレットのTABインデント、Leader2回でチェックボックスのトグル
+repo = "violetyk/iikanji-markdown.vim"
+hook_add = """
+    let g:iikanji#markdown#mapping#toggle_checkbox="<Leader>x"
+"""
+
+[[plugins]] # :TableModeToggle
+repo = 'dhruvasagar/vim-table-mode'
+
+[[plugins]] # :PreviewMarkdown
+repo = 'skanehira/preview-markdown.vim'
+hook_add = """
+    let g:preview_markdown_parser='glow'
+    command! PrevMD :PreviewMarkdown right
+"""
+
+[[plugins]]
+repo = 'vimlab/split-term.vim'
+hook_add = """
+    set splitright
+"""

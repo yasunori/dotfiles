@@ -140,6 +140,9 @@ alias sudo='sudo '
 alias -g L='| less'
 alias -g G='| grep'
 
+# ccatの色
+alias ccat='ccat -G String="_brown_" -G Plaintext="lightgrey" -G Punctuation="darkteal" -G Decimal="darkgreen" -G Keyword="green" -G Comment="darkgray" -G Tag="faint"'
+
 # C で標準出力をクリップボードにコピーする
 # mollifier delta blog : http://mollifier.hatenablog.com/entry/20100317/p1
 if which pbcopy >/dev/null 2>&1 ; then
@@ -259,16 +262,24 @@ case ${OSTYPE} in
         #Linux用の設定
         #自分のvim使う
         alias vi='env LANG=ja_JP.UTF-8 $HOME/.linuxbrew/bin/nvim "$@"'
+        alias vim='env LANG=ja_JP.UTF-8 $HOME/.linuxbrew/bin/nvim "$@"'
+        # GIT_EDITOR
+        export GIT_EDITOR=$HOME/.linuxbrew/bin/nvim
+
+        # EDITOR
+        # nvim内のterminalでnvimを開くとき、nvr を使うと入れ子にならずにもとのnvimで開き直してくれる
+        # cf. https://github.com/mhinz/neovim-remote
+        # VIMRUNTIME が設定されているかどうかで、nvim内かを見分ける
+        if [ -n "$VIMRUNTIME" ]; then
+            export EDITOR=nvr
+        else
+            export EDITOR=$HOME/.linuxbrew/bin/nvim
+        fi
 
         # linuxbrew
         if [[ -e ~/.linuxbrew ]]; then
             export PATH=$HOME/.linuxbrew/bin:$HOME/.linuxbrew/sbin:$PATH
         fi
-
-
-        # GIT
-        export GIT_EDITOR=$HOME/.linuxbrew/bin/nvim
-
 
         # tmuxで256色使えない問題
         alias tmux='tmux -2'
@@ -292,9 +303,140 @@ esac
 # vim:set ft=zsh:
 
 
+# fzf
+export FZF_DEFAULT_COMMAND='rg --files --hidden --glob "!.git"'
+export FZF_DEFAULT_OPTS='--height 40% --reverse'
+
+
+###################
+# notes関連
+# notes-cli を導入した
+# cf. https://github.com/rhysd/notes-cli
+###################
+
+export NOTES_CLI_HOME=$HOME/notes
+
+
+# notes-new category filename
+# ファイル名に日付が無ければ補完する
+# あればedit、無ければnew
+function notes-new() {
+    local file
+    local cnt
+    if [ -n "$1" ] && [ -n "$2" ]; then
+        if [[ $2 =~ ^[0-9]{4}-[0-9]{2}-[0-9]{2} ]]; then
+            file=$2
+        else
+            export TZ="Asia/Tokyo"
+            file=$(date "+%Y-%m-%d")-$2
+            unset TZ
+        fi
+        cnt=$(notes-exists $1 $file)
+        if [ $cnt = "0" ]; then
+            # new
+            #export TZ="Asia/Tokyo"
+            notes new $1 $file $3
+        else
+            # edit
+            notes ls -c $1 | grep /$file.md | xargs $EDITOR
+        fi
+    fi
+}
+
+
+# ファイルが存在するかを返す
+function notes-exists() {
+    local cnt
+    if [ -n "$1" ] && [ -n "$2" ]; then
+        cnt=$(notes ls -c $1 | grep -c $2.md)
+        echo $cnt
+    fi
+}
+
+# notesをgrepしてfzfして開く
+# 該当行を表示したいために rg に -l をつけない。代わりにcatしてawkしてeditorに渡す
+function notes-grep() {
+    local -A opthash
+    local opts
+    local word
+    zparseopts -D -A opthash -- c: t:
+    opts=""
+    if [[ -n "${opthash[(i)-c]}" ]]; then
+      opts=" $opts -c ${opthash[-c]}"
+    fi
+    if [[ -n "${opthash[(i)-t]}" ]]; then
+      opts=" $opts -t ${opthash[-t]}"
+    fi
+    word=$@
+
+    local list
+    local file
+    if [ -n "$word" ]; then
+        list=$(notes ls `echo ${opts}`)
+        if [ -n "$list" ]; then
+            file=$(notes ls `echo ${opts}` | xargs rg -i "$word" | ccat | fzf | awk -F: '{print $1}')
+            [ -n "$file" ] && $EDITOR "$file"
+        fi
+    fi
+}
+
+# notes名をfindしてfzfして開く
+function notes-list() {
+    local -A opthash
+    local opts
+    local word
+    zparseopts -D -A opthash -- c: t:
+    opts=""
+    if [[ -n "${opthash[(i)-c]}" ]]; then
+      opts=" $opts -c ${opthash[-c]}"
+    fi
+    if [[ -n "${opthash[(i)-t]}" ]]; then
+      opts=" $opts -t ${opthash[-t]}"
+    fi
+    word=$@
+
+    local list
+    local files
+    local file
+    if [ -z "$word" ]; then
+        word="md"  # 必ずあるword=>全部出す
+    fi
+    list=$(notes ls `echo ${opts}`)
+    if [ -n "$list" ]; then
+        files=$(notes ls `echo ${opts}` | rg -i $word)
+        if [ -n "$files" ]; then
+            file=$(notes ls `echo ${opts}` | rg -i $word | fzf)
+            [ -n "$file" ] && $EDITOR "$file"
+        fi
+    fi
+}
+
+# 日報
+function notes-diary() {
+    notes-new diary diary
+}
+
+# 即メモ
+function notes-memo() {
+    local file 
+    if [ -n "$1" ]; then
+        file=$1
+    else
+        echo -n filename?:
+        read file
+    fi
+    notes-new memo $file
+}
+
+# チェックのついていないチェックボックスを検索
+function notes-todo() {
+    notes-grep "\[\s\]"
+}
+
+
 # zplug
 if [ ! ${ZPLUG_HOME:-default} = "default" ]; then
-    zplug "junegunn/fzf-bin", as:command, from:gh-r, rename-to:fzf
+    # zplug "junegunn/fzf-bin", as:command, from:gh-r, rename-to:fzf
     zplug "arks22/tmuximum", as:command
     zplug 'zsh-users/zsh-autosuggestions'
 
@@ -322,3 +464,6 @@ ZSH_AUTOSUGGEST_HIGHLIGHT_STYLE='fg=242'
 if [[ ! -n $TMUX && $- == *l* ]]; then
     tmuximum
 fi
+
+# sync HW clock
+sudo hwclock -s

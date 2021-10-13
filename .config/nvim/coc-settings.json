@@ -48,5 +48,6 @@
         "N": "hint"
       }
     }
-  }
+  },
+  "tabnine.disable_filetypes": ["markdown"]
 }

@@ -11,6 +11,17 @@ repo = 'osyo-manga/vim-precious'
 depends = ['context_filetype.vim']
 
 
+#[[plugins]] # bullets
+#repo = 'dkarter/bullets.vim'
+#hook_add = '''
+#let g:bullets_enabled_file_types = [
+#    \ 'markdown',
+#    \ 'text',
+#    \ 'gitcommit',
+#    \ 'scratch'
+#    \]
+#'''
+
 #[[plugins]]
 #repo = 'Shougo/neosnippet.vim'
 #on_event = 'InsertCharPre'
