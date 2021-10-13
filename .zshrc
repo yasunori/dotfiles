@@ -195,7 +195,6 @@ fi
 # tmuxinator があれば
 if [[ -e ~/.tmuxinator ]]; then
     [[ -s $HOME/.tmuxinator/scripts/tmuxinator ]] && source $HOME/.tmuxinator/scripts/tmuxinator
-    export EDITOR=vi
 fi
 
 # nodebrew があれば
@@ -466,4 +465,7 @@ if [[ ! -n $TMUX && $- == *l* ]]; then
 fi
 
 # sync HW clock
-sudo hwclock -s
+if [ -n "$WSLENV" ]; then
+    echo "wsl"
+    sudo hwclock -s
+fi
