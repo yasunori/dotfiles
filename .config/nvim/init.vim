@@ -115,7 +115,7 @@ syntax enable
 
 " terminalにてESCでコマンドモードに戻る
 " tnoremap <silent> <ESC> <C-\><C-n>
-tnoremap <silent> <ESC> <C-\><C-n>
+tnoremap <silent> <leader><ESC> <C-\><C-n>
 
 "let g:notes_cli_select_cmd='fzf'
 "let g:notes_cli_edit_cmd=':e'

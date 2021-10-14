@@ -192,4 +192,5 @@ repo = 'vimlab/split-term.vim'
 hook_add = """
     set splitright
     let g:split_term_default_shell = "zsh"
+    let g:disable_key_mappings="<ESC>"
 """
