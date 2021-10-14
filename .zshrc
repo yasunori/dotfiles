@@ -329,6 +329,7 @@ function notesnew() {
             export TZ="Asia/Tokyo"
             file=$(date "+%Y-%m-%d")-$2
             unset TZ
+            file=`echo ${file// /-}`
         fi
         cnt=$(notesexists $1 $file)
         if [ -z "$VIMRUNTIME" ] && cd $NOTES_CLI_HOME  # vimから開いたので無ければカレント変更
