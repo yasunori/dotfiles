@@ -304,7 +304,24 @@ esac
 
 # fzf
 export FZF_DEFAULT_COMMAND='rg --files --hidden --glob "!.git"'
-export FZF_DEFAULT_OPTS='--height 40% --reverse'
+#export FZF_DEFAULT_OPTS='--height 40% --reverse'
+export FZF_DEFAULT_OPTS='--color=fg+:11 --height 70% --reverse --select-1 --exit-0 --multi'
+
+###################
+# お便利関数
+###################
+# fgを使わずctrl+zで行ったり来たりする
+fancy-ctrl-z () {
+  if [[ $#BUFFER -eq 0 ]]; then
+    BUFFER="fg"
+    zle accept-line
+  else
+    zle push-input
+    zle clear-screen
+  fi
+}
+zle -N fancy-ctrl-z
+bindkey '^Z' fancy-ctrl-z
 
 
 ###################
@@ -372,13 +389,21 @@ function notesgrep() {
 
     local list
     local file
+    local cnt
     if [ -n "$word" ]; then
+        echo "notes ls `echo ${opts}`"
         list=$(notes ls `echo ${opts}`)
         if [ -n "$list" ]; then
-            file=$(notes ls `echo ${opts}` | xargs rg -i "$word" | ccat | fzf | awk -F: '{print $1}')
-            if [ -n "$file" ]; then
-                if [ -z "$VIMRUNTIME" ] && cd $NOTES_CLI_HOME  # vimから開いたので無ければカレント変更
-                $EDITOR "$file"
+            # 1行だったらそのまま開く
+            cnt=$(notes ls `echo ${opts}` | xargs rg -l -i "$word" | wc -l)
+            if [ $cnt = 1 ]; then
+                $EDITOR $(notes ls `echo ${opts}` | xargs rg -l -i "$word")
+            else
+                file=$(notes ls `echo ${opts}` | xargs rg -i "$word" | ccat | fzf | awk -F: '{print $1}')
+                if [ -n "$file" ]; then
+                    if [ -z "$VIMRUNTIME" ] && cd $NOTES_CLI_HOME  # vimから開いたので無ければカレント変更
+                    $EDITOR "$file"
+                fi
             fi
         fi
     fi
