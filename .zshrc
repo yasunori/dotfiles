@@ -319,7 +319,7 @@ export NOTES_CLI_HOME=$HOME/notes
 # notes-new category filename
 # ファイル名に日付が無ければ補完する
 # あればedit、無ければnew
-function notes-new() {
+function notesnew() {
     local file
     local cnt
     if [ -n "$1" ] && [ -n "$2" ]; then
@@ -330,7 +330,8 @@ function notes-new() {
             file=$(date "+%Y-%m-%d")-$2
             unset TZ
         fi
-        cnt=$(notes-exists $1 $file)
+        cnt=$(notesexists $1 $file)
+        if [ -z "$VIMRUNTIME" ] && cd $NOTES_CLI_HOME  # vimから開いたので無ければカレント変更
         if [ $cnt = "0" ]; then
             # new
             #export TZ="Asia/Tokyo"
@@ -344,7 +345,7 @@ function notes-new() {
 
 
 # ファイルが存在するかを返す
-function notes-exists() {
+function notesexists() {
     local cnt
     if [ -n "$1" ] && [ -n "$2" ]; then
         cnt=$(notes ls -c $1 | grep -c $2.md)
@@ -354,7 +355,7 @@ function notes-exists() {
 
 # notesをgrepしてfzfして開く
 # 該当行を表示したいために rg に -l をつけない。代わりにcatしてawkしてeditorに渡す
-function notes-grep() {
+function notesgrep() {
     local -A opthash
     local opts
     local word
@@ -374,13 +375,16 @@ function notes-grep() {
         list=$(notes ls `echo ${opts}`)
         if [ -n "$list" ]; then
             file=$(notes ls `echo ${opts}` | xargs rg -i "$word" | ccat | fzf | awk -F: '{print $1}')
-            [ -n "$file" ] && $EDITOR "$file"
+            if [ -n "$file" ]; then
+                if [ -z "$VIMRUNTIME" ] && cd $NOTES_CLI_HOME  # vimから開いたので無ければカレント変更
+                $EDITOR "$file"
+            fi
         fi
     fi
 }
 
 # notes名をfindしてfzfして開く
-function notes-list() {
+function noteslist() {
     local -A opthash
     local opts
     local word
@@ -405,18 +409,21 @@ function notes-list() {
         files=$(notes ls `echo ${opts}` | rg -i $word)
         if [ -n "$files" ]; then
             file=$(notes ls `echo ${opts}` | rg -i $word | fzf)
-            [ -n "$file" ] && $EDITOR "$file"
+            if [ -n "$file" ]; then
+                if [ -z "$VIMRUNTIME" ] && cd $NOTES_CLI_HOME  # vimから開いたので無ければカレント変更
+                $EDITOR "$file"
+            fi
         fi
     fi
 }
 
 # 日報
-function notes-diary() {
-    notes-new diary diary
+function notesdiary() {
+    notesnew diary diary
 }
 
 # 即メモ
-function notes-memo() {
+function notesmemo() {
     local file 
     if [ -n "$1" ]; then
         file=$1
@@ -424,47 +431,64 @@ function notes-memo() {
         echo -n filename?:
         read file
     fi
-    notes-new memo $file
+    notesnew memo $file
 }
 
 # チェックのついていないチェックボックスを検索
-function notes-todo() {
-    notes-grep "\[\s\]"
+function notestodo() {
+    notesgrep "\[\s\]"
 }
 
+# なんとなく合わせる
+function notessave() {
+    notes save
+}
 
-# zplug
-if [ ! ${ZPLUG_HOME:-default} = "default" ]; then
-    # zplug "junegunn/fzf-bin", as:command, from:gh-r, rename-to:fzf
-    zplug "arks22/tmuximum", as:command
-    zplug 'zsh-users/zsh-autosuggestions'
+# pull
+function notespull() {
+(cd $NOTES_CLI_HOME && git pull)
+}
 
-
-    # 未インストール項目をインストールする
-    if ! zplug check --verbose; then
-        printf "Install? [y/N]: "
-        if read -q; then
-            echo; zplug install
-        fi
-    fi
-
-    # コマンドをリンクして、PATH に追加し、プラグインは読み込む
-    zplug load --verbose
-fi
-
-# zplug後に必要な設定
-
-# autosuggestionsの色
-ZSH_AUTOSUGGEST_HIGHLIGHT_STYLE='fg=242'
-
-
-## 最後
-# tmuxを自動起動。体裁はtmuximumに任せた
-if [[ ! -n $TMUX && $- == *l* ]]; then
-    tmuximum
-fi
-
+# WSLのとき時刻合わせを定期的にしないとずれる
 # sync HW clock
 if [ -n "$WSLENV" ]; then
     sudo hwclock -s
+fi
+
+# zplug読み込むかどうかの判定
+export ZPLUG_LOAD_FLG="1"
+if [ -n "$VIMRUNTIME" ]; then  # vimからのtermのとき速度向上のためやらない
+    ZPLUG_LOAD_FLG="0"
+fi
+
+if [ "$ZPLUG_LOAD_FLG" = "1" ]; then
+    # zplug
+    if [ ! ${ZPLUG_HOME:-default} = "default" ]; then
+        # zplug "junegunn/fzf-bin", as:command, from:gh-r, rename-to:fzf
+        zplug "arks22/tmuximum", as:command
+        zplug 'zsh-users/zsh-autosuggestions'
+
+
+        # 未インストール項目をインストールする
+        if ! zplug check --verbose; then
+            printf "Install? [y/N]: "
+            if read -q; then
+                echo; zplug install
+            fi
+        fi
+
+        # コマンドをリンクして、PATH に追加し、プラグインは読み込む
+        zplug load --verbose
+    fi
+
+    # zplug後に必要な設定
+
+    # autosuggestionsの色
+    ZSH_AUTOSUGGEST_HIGHLIGHT_STYLE='fg=242'
+
+    ## 最後
+    # tmuxを自動起動。体裁はtmuximumに任せた
+    if [[ ! -n $TMUX && $- == *l* ]]; then
+        tmuximum
+    fi
 fi

@@ -191,4 +191,5 @@ hook_add = """
 repo = 'vimlab/split-term.vim'
 hook_add = """
     set splitright
+    let g:split_term_default_shell = "zsh"
 """
