@@ -337,30 +337,50 @@ export NOTES_CLI_HOME=$HOME/notes
 # ファイル名に日付が無ければ補完する
 # あればedit、無ければnew
 function notesnew() {
-    local file
+    local f
+    local category
+    local filename
     local cnt
-    if [ -n "$1" ] && [ -n "$2" ]; then
-        if [[ $2 =~ ^[0-9]{4}-[0-9]{2}-[0-9]{2} ]]; then
-            file=$2
-        else
-            export TZ="Asia/Tokyo"
-            file=$(date "+%Y-%m-%d")-$2
-            unset TZ
-            file=`echo ${file// /-}`
-        fi
-        cnt=$(notesexists $1 $file)
-        if [ -z "$VIMRUNTIME" ] && cd $NOTES_CLI_HOME  # vimから開いたので無ければカレント変更
-        if [ $cnt = "0" ]; then
-            # new
-            #export TZ="Asia/Tokyo"
-            notes new $1 $file $3
-        else
-            # edit
-            notes ls -c $1 | grep /$file.md | xargs $EDITOR
-        fi
+    if [ -n "$1" ]; then
+        category=$1
+    else
+        echo -n category?:
+        read category
+    fi
+
+    if [ -n "$2" ]; then
+        f=$2
+    else
+        echo -n filename?:
+        read f
+    fi
+
+    if [[ f =~ ^[0-9]{4}-[0-9]{2}-[0-9]{2} ]]; then
+        filename=$f
+    else
+        export TZ="Asia/Tokyo"
+        filename=$(date "+%Y-%m-%d")-$f
+        unset TZ
+    fi
+
+    filename=`echo ${filename// /-}`
+
+    cnt=$(notesexists $category $filename)
+    if [ -z "$VIMRUNTIME" ] && cd $NOTES_CLI_HOME  # vimから開いたので無ければカレント変更
+    if [ $cnt = "0" ]; then
+        # new
+        #export TZ="Asia/Tokyo"
+        notes new $category $filename $3
+    else
+        # edit
+        notes ls -c $category | grep /$filename.md | xargs $EDITOR
     fi
 }
 
+# よく間違えるので作った
+function notesadd() {
+    notesnew $1 $2 $3
+}
 
 # ファイルが存在するかを返す
 function notesexists() {
@@ -391,7 +411,6 @@ function notesgrep() {
     local file
     local cnt
     if [ -n "$word" ]; then
-        echo "notes ls `echo ${opts}`"
         list=$(notes ls `echo ${opts}`)
         if [ -n "$list" ]; then
             # 1行だったらそのまま開く
