@@ -330,6 +330,7 @@ bindkey '^Z' fancy-ctrl-z
 # cf. https://github.com/rhysd/notes-cli
 ###################
 
+# 最後スラッシュをつけないこと。notesmoveで使っている
 export NOTES_CLI_HOME=$HOME/notes
 
 
@@ -355,7 +356,7 @@ function notesnew() {
         read f
     fi
 
-    if [[ f =~ ^[0-9]{4}-[0-9]{2}-[0-9]{2} ]]; then
+    if [[ $f =~ ^[0-9]{4}-[0-9]{2}-[0-9]{2}.{0,} ]]; then
         filename=$f
     else
         export TZ="Asia/Tokyo"
@@ -462,9 +463,64 @@ function noteslist() {
     fi
 }
 
+# 現在のカテゴリを絶対パスから取得
+function notescategory() {
+    if [ -n "$1" ]; then
+        echo $1 | sed -e "s@`echo $NOTES_CLI_HOME`/@@g" | sed -e "s@/`echo $(basename $1)`@@g"
+    fi
+}
+
+function notesmove() {
+    local new_category
+    local filefullpath
+    if [ -n "$1" ]; then
+        new_category=$1
+        echo "new_category?: $new_category"
+    else
+        echo -n new category?:
+        read new_category
+    fi
+
+    filefullpath=$(notes ls | fzf)
+    echo $new_category
+    echo $filefullpath
+    notesmoveone $new_category $filefullpath
+}
+
+# 1つのファイルについてカテゴリを移動させる
+# new_category filefullpath_from
+function notesmoveone() {
+    local filefullpath_from
+    local filefullpath_to
+    local filename
+    local category_from
+    local category_to
+    local category_key_from
+    local category_key_to
+    if [ -n "$1" ] && [ -n "$2" ]; then
+        filefullpath_from=$2
+        filename=`echo $(basename $filefullpath_from)`
+        category_from=`notescategory $filefullpath_from`
+        category_to=$1
+        filefullpath_to="$NOTES_CLI_HOME/$1/$filename"
+
+        mv $filefullpath_from $filefullpath_to
+
+        if [[ -e $filefullpath_to ]]; then
+            category_key_fron="Category: $category_from"
+            category_key_to="Category: $category_to"
+
+            sed -i "s@`echo $category_key_fron`@`echo $category_key_to`@g" $filefullpath_to
+        fi
+    fi
+}
+
 # 日報
 function notesdiary() {
     notesnew diary diary
+}
+function diary() {
+    notesdiary
 }
 
 # 即メモ
@@ -477,6 +533,9 @@ function notesmemo() {
         read file
     fi
     notesnew memo $file
+}
+function memo() {
+    notesmemo $1
 }
 
 # チェックのついていないチェックボックスを検索
