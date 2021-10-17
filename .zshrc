@@ -305,7 +305,7 @@ esac
 # fzf
 export FZF_DEFAULT_COMMAND='rg --files --hidden --glob "!.git"'
 #export FZF_DEFAULT_OPTS='--height 40% --reverse'
-export FZF_DEFAULT_OPTS='--color=fg+:11 --height 70% --reverse --select-1 --exit-0 --multi'
+export FZF_DEFAULT_OPTS='--color=fg+:11 --height 70% --reverse --exit-0 --multi --ansi --preview-window noborder'
 
 ###################
 # お便利関数
@@ -419,7 +419,7 @@ function notesgrep() {
             if [ $cnt = 1 ]; then
                 $EDITOR $(notes ls `echo ${opts}` | xargs rg -l -i "$word")
             else
-                file=$(notes ls `echo ${opts}` | xargs rg -i "$word" | ccat | fzf | awk -F: '{print $1}')
+                file=$(notes ls `echo ${opts}` | xargs rg -i "$word" | ccat | fzf --height=100% | awk -F: '{print $1}')
                 if [ -n "$file" ]; then
                     if [ -z "$VIMRUNTIME" ] && cd $NOTES_CLI_HOME  # vimから開いたので無ければカレント変更
                     $EDITOR "$file"
@@ -454,7 +454,8 @@ function noteslist() {
     if [ -n "$list" ]; then
         files=$(notes ls `echo ${opts}` | rg -i $word)
         if [ -n "$files" ]; then
-            file=$(notes ls `echo ${opts}` | rg -i $word | fzf)
+            #file=$(notes ls `echo ${opts}` | rg -i $word | fzf --preview "bat --color=always --style=header,grid --line-range :100 {}")
+            file=$(notes ls `echo ${opts}` | rg -i $word | fzf --height 100% --preview "bat --color=always --style=grid --line-range :100 {}")
             if [ -n "$file" ]; then
                 if [ -z "$VIMRUNTIME" ] && cd $NOTES_CLI_HOME  # vimから開いたので無ければカレント変更
                 $EDITOR "$file"
