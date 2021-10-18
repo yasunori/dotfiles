@@ -117,6 +117,9 @@ syntax enable
 " tnoremap <silent> <ESC> <C-\><C-n>
 tnoremap <silent> <leader><ESC> <C-\><C-n>
 
+" terminal insertモードではじめる
+autocmd TermOpen * startinsert
+
 "let g:notes_cli_select_cmd='fzf'
 "let g:notes_cli_edit_cmd=':e'
 

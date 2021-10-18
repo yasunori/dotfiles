@@ -39,8 +39,12 @@ hook_add = '''
     "rgあれば使う
     if executable('rg')
       call denite#custom#var('file_rec', 'command',
-        \ ['rg', '--files', '--glob', '!.git'])
+        \ ['rg', '--files', '--glob', '!.git', '--color', 'always'])
       call denite#custom#var('grep', 'command', ['rg'])
+      call denite#custom#var('grep', 'recursive_opts', [])
+      call denite#custom#var('grep', 'final_opts', [])
+      call denite#custom#var('grep', 'separator', ['--'])
+      call denite#custom#var('grep', 'default_opts', ['--vimgrep', '--no-heading'])
     endif
 
     "file/recの除外ファイル設定
@@ -81,6 +85,57 @@ hook_add = '''
     "nnoremap <silent><Leader>ugn :<C-u>Denite -resume -buffer-name=search-buffer-denite -select=+1 -immediately<CR>
     " resumeした検索結果の前の行の結果へ飛ぶ
     "nnoremap <silent><Leader>ugp :<C-u>Denite -resume -buffer-name=search-buffer-denite -select=-1 -immediately<CR>
+
+    " Notes
+    " ノートの一覧
+    command! -nargs=? Noteslist call Noteslist(<f-args>)
+    function! Noteslist(...)
+      if a:0 >= 1
+        if a:1 == 'memo'
+          :Denite -start-filter -path=~/notes/memo file/rec
+        endif
+        if a:1 == 'clients'
+          :Denite -start-filter -path=~/notes/clients file/rec
+        endif
+      else
+        :Denite -start-filter -path=~/notes/ file/rec
+      endif
+    endfunction
+
+    " ノートの検索
+    command! -nargs=? Notesgrep call Notesgrep(<f-args>)
+    function! Notesgrep(...)
+      if a:0 >= 1
+        if a:1 == 'memo'
+          :Denite grep -path=~/notes/memo -buffer-name=search-buffer-denite
+        endif
+        if a:1 == 'clients'
+          :Denite grep -path=~/notes/clients -buffer-name=search-buffer-denite
+        endif
+      else
+        :Denite grep -path=~/notes/ -buffer-name=search-buffer-denite
+      endif
+    endfunction
+
+    " ノート作成
+    command! Notesadd :term notesadd
+
+    " メモ作成
+    command! -nargs=? Memo call Memo(<f-args>)
+    function! Memo(...)
+      if a:0 >= 1
+         exe("term memo " . a:1)
+      else
+        :term memo
+      endif
+    endfunction
+
+    " 今日の日記作成
+    command! Diary :term diary
+
+    " TODO検索
+    command! Todo :Denite grep:::'\[\s\]'
+
 
     "バッファ一覧
     autocmd FileType denite call s:denite_my_settings()
