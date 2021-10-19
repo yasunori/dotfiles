@@ -207,6 +207,7 @@ hook_add = """
       \ 'coc-diagnostic',
       \ 'coc-json',
       \ 'coc-tabnine',
+      \ 'coc-tsserver',
       \ ]
 
       inoremap <silent><expr> <TAB>

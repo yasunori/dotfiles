@@ -305,7 +305,7 @@ esac
 # fzf
 export FZF_DEFAULT_COMMAND='rg --files --hidden --glob "!.git"'
 #export FZF_DEFAULT_OPTS='--height 40% --reverse'
-export FZF_DEFAULT_OPTS='--color=fg+:11 --height 70% --reverse --exit-0 --multi --ansi --preview-window noborder'
+export FZF_DEFAULT_OPTS='--color=fg+:11 --height 70% --reverse --exit-0 --multi --bind=ctrl-a:toggle-all --ansi --preview-window noborder'
 
 ###################
 # お便利関数
@@ -323,6 +323,21 @@ fancy-ctrl-z () {
 zle -N fancy-ctrl-z
 bindkey '^Z' fancy-ctrl-z
 
+
+###################
+# git関連
+# cf. https://dev.classmethod.jp/articles/fzf-original-app-for-git-add/
+# #################
+function gadd() {
+    local selected
+    selected=$(unbuffer git status -s | fzf -m --height 100% --preview="echo {} | awk '{print \$2}' | xargs git diff --color" | awk '{print $2}')
+    if [[ -n "$selected" ]]; then
+        selected=$(tr '\n' ' ' <<< "$selected")
+        selected=$(echo $selected | sed 's/\s*$//')  # strip
+        git add $(echo $selected)
+        echo "Completed: git add $selected"
+    fi
+}
 
 ###################
 # notes関連
