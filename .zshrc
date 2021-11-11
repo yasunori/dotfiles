@@ -382,14 +382,21 @@ function notesnew() {
     filename=`echo ${filename// /-}`
 
     cnt=$(notesexists $category $filename)
-    if [ -z "$VIMRUNTIME" ] && cd $NOTES_CLI_HOME  # vimから開いたので無ければカレント変更
     if [ $cnt = "0" ]; then
         # new
         #export TZ="Asia/Tokyo"
-        notes new $category $filename $3
+        if [ -z "$VIMRUNTIME" ]; then  # vimから呼ばれていないときはcdする
+            (cd $NOTES_CLI_HOME && notes new $category $filename $3)
+        else
+            notes new $category $filename $3
+        fi
     else
         # edit
-        notes ls -c $category | grep /$filename.md | xargs $EDITOR
+        if [ -z "$VIMRUNTIME" ]; then  # vimから呼ばれていないときはcdする
+            (cd $NOTES_CLI_HOME && notes ls -c $category | grep /$filename.md | xargs $EDITOR)
+        else
+            notes ls -c $category | grep /$filename.md | xargs $EDITOR
+        fi
     fi
 }
 
@@ -472,8 +479,13 @@ function noteslist() {
             #file=$(notes ls `echo ${opts}` | rg -i $word | fzf --preview "bat --color=always --style=header,grid --line-range :100 {}")
             file=$(notes ls `echo ${opts}` | rg -i $word | fzf --height 100% --preview "bat --color=always --style=grid --line-range :100 {}")
             if [ -n "$file" ]; then
-                if [ -z "$VIMRUNTIME" ] && cd $NOTES_CLI_HOME  # vimから開いたので無ければカレント変更
-                $EDITOR "$file"
+                #if [ -z "$VIMRUNTIME" ] && cd $NOTES_CLI_HOME  # vimから開いたので無ければカレント変更
+                #$EDITOR "$file"
+                if [ -z "$VIMRUNTIME" ]; then
+                    (cd $NOTES_CLI_HOME && $EDITOR "$file")
+                else
+                    $EDITOR "$file"
+                fi
             fi
         fi
     fi
@@ -535,11 +547,8 @@ function notesmoveone() {
 function notesdiary() {
     notesnew diary diary
 }
-function diary() {
-    notesdiary
-}
 
-# 即メモ
+# メモ
 function notesmemo() {
     local file 
     if [ -n "$1" ]; then
@@ -549,9 +558,6 @@ function notesmemo() {
         read file
     fi
     notesnew memo $file
-}
-function memo() {
-    notesmemo $1
 }
 
 # チェックのついていないチェックボックスを検索
@@ -567,6 +573,25 @@ function notessave() {
 # pull
 function notespull() {
 (cd $NOTES_CLI_HOME && git pull)
+}
+
+# n で呼び出す
+function n() {
+  if [ -n "$1" ]; then
+    cmd=$1
+    case "$cmd" in
+      "grep" ) notesgrep $2;;
+      "add" ) notesadd $2 $3 $4;;
+      "memo" ) notesmemo;;
+      "diary" ) notesdiary;;
+      "todo" ) notestodo;;
+      "save" ) notessave;;
+      "pull" ) notespull;;
+    esac
+  else
+      # 基本はnoteslist
+      noteslist
+  fi
 }
 
 # WSLのとき時刻合わせを定期的にしないとずれる
