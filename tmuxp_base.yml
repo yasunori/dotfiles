@@ -1,0 +1,12 @@
+session_name: base
+
+tmux_command: tmux -2
+
+windows:
+  - window_name: notes
+    shell_command_before:
+      - tmux source ~/.tmux.base.conf 
+      - cd ~/notes/
+  - window_name: dev
+    shell_command_before:
+      - ssh dev
