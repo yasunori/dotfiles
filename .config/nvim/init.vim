@@ -6,6 +6,18 @@ augroup END
 " leaderをspaceにしよう
 let mapleader = "\<Space>"
 
+" クリップボードをWSL-Windows間で共有
+"set clipboard&
+"set clipboard^=unnamedplus
+
+" こちらはvim->windowsうまくいったが遅かったので一旦コメントアウト
+"if system('uname -a | grep microsoft') != ''
+"    augroup myYank
+"        autocmd!
+"        autocmd TextYankPost * :call system('clip.exe', @")
+"    augroup END
+"endif"
+
 " filetype検出
 filetype on
 
@@ -14,6 +26,7 @@ let $CACHE = empty($XDG_CACHE_HOME) ? expand('$HOME/.cache') : $XDG_CACHE_HOME
 let $CONFIG = empty($XDG_CONFIG_HOME) ? expand('$HOME/.config') : $XDG_CONFIG_HOME
 let $DATA = empty($XDG_DATA_HOME) ? expand('$HOME/.local/share') : $XDG_DATA_HOME
 
+" デフォルトのpython
 let g:python3_host_prog = expand('$HOME/.python/current/bin/python')
 
 " Load rc file
@@ -29,6 +42,7 @@ call s:load('plugins')
 
 " バッファ切り替え時に、バッファを自動的にファイルに保存する
 "set autowrite
+
 " バックアップファイルを作成しない
 set nobackup
 
@@ -87,10 +101,13 @@ nnoremap j gj
 nnoremap k gk
 
 " CTRL-hjklでウィンドウ移動
-nnoremap <C-j> <C-w>j
-nnoremap <C-k> <C-w>k
-nnoremap <C-l> <C-w>l
-nnoremap <C-h> <C-w>h
+"nnoremap <C-j> <C-w>j
+"nnoremap <C-k> <C-w>k
+"nnoremap <C-l> <C-w>l
+"nnoremap <C-h> <C-w>h
+
+" 補完
+" set completeopt=menuone,noinsert
 
 "コマンドラインで、カレントディレクトリを入れよう
 "C-xで入れられる
@@ -109,20 +126,14 @@ let format_allow_over_tw = 2
 
 "set t_Co=256
 
-
 syntax enable
 
 
-" terminalにてESCでコマンドモードに戻る
-" tnoremap <silent> <ESC> <C-\><C-n>
+" terminalにてleader+ESCでコマンドモードに戻る
 tnoremap <silent> <leader><ESC> <C-\><C-n>
 
 " terminal insertモードではじめる
 autocmd TermOpen * startinsert
-
-"let g:notes_cli_select_cmd='fzf'
-"let g:notes_cli_edit_cmd=':e'
-
 
 " スクリプト直接実行
 "function! s:Exec()
