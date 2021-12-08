@@ -163,6 +163,11 @@ export XDG_CONFIG_HOME="$HOME/.config"
 ########################################
 # 共通のツール設定
 
+# dotfiles/bin
+if [[ -e ~/dotfiles/bin ]]; then
+    export PATH=$HOME/dotfiles/bin:$PATH
+fi
+
 # python
 if [[ -e ~/.python/current ]]; then
     export PATH=$HOME/.python/current/bin:$PATH
@@ -296,6 +301,9 @@ case ${OSTYPE} in
         #tmuximum
         alias t="tmuximum"
 
+        #tmuxpのベース用起動。prefix keyが"\"になっている
+        alias tb="tmuxp load tmuxp_base"
+
         ;;
 esac
 
@@ -347,7 +355,7 @@ function gadd() {
 
 # 最後スラッシュをつけないこと。notesmoveで使っている
 export NOTES_CLI_HOME=$HOME/notes
-
+export NOTES_CLI_TEMPLATE=$HOME/notes/template.md
 
 # notes-new category filename
 # ファイル名に日付が無ければ補完する
@@ -357,6 +365,7 @@ function notesnew() {
     local category
     local filename
     local cnt
+    local filefullpath
     if [ -n "$1" ]; then
         category=$1
     else
@@ -371,47 +380,81 @@ function notesnew() {
         read f
     fi
 
+    # filenameに日付を補完する
     if [[ $f =~ ^[0-9]{4}-[0-9]{2}-[0-9]{2}.{0,} ]]; then
         filename=$f
     else
-        export TZ="Asia/Tokyo"
-        filename=$(date "+%Y-%m-%d")-$f
-        unset TZ
+        filename=`notesdate`-$f
     fi
 
-    filename=`echo ${filename// /-}`
-
-    cnt=$(notesexists $category $filename)
-    if [ $cnt = "0" ]; then
+    filename=`echo ${filename// /-}`  # スペースは-に変換する
+    filefullpath=`notesfullpath $category $filename`
+    if [ ! -e "$filefullpath" ]; then
         # new
-        #export TZ="Asia/Tokyo"
+        notesnewbyfullpath $filefullpath
+    fi
+
+    notesopen $filefullpath
+}
+
+# noteを開くとき、notes directoryに遷移すると補完などに便利なのでそうする
+# vimのterminal内のときはやらない
+function notesopen() {
+    local filefullpath
+    if [ -n "$1" ]; then
+        filefullpath=$1
         if [ -z "$VIMRUNTIME" ]; then  # vimから呼ばれていないときはcdする
-            (cd $NOTES_CLI_HOME && notes new $category $filename $3)
+            (cd $NOTES_CLI_HOME && $EDITOR "$filefullpath")
         else
-            notes new $category $filename $3
-        fi
-    else
-        # edit
-        if [ -z "$VIMRUNTIME" ]; then  # vimから呼ばれていないときはcdする
-            (cd $NOTES_CLI_HOME && notes ls -c $category | grep /$filename.md | xargs $EDITOR)
-        else
-            notes ls -c $category | grep /$filename.md | xargs $EDITOR
+            $EDITOR "$filefullpath"
         fi
     fi
 }
 
+# ファイル用のdate表示
+function notesdate() {
+    local d
+    export TZ="Asia/Tokyo"
+    d=$(date "+%Y-%m-%d")
+    unset TZ
+    echo $d
+}
+
+# ヘッダ用のdate iso表示
+function notesdateiso() {
+    local d
+    export TZ="Asia/Tokyo"
+    d=$(date -I"seconds")
+    unset TZ
+    echo $d
+}
+
+# categoryとfilenameから絶対パスを取得
+function notesfullpath() {
+    local category
+    local filename
+    if [ -n "$1" ] && [ -n "$2" ]; then
+        category=$1
+        if [[ $2 =~ .md ]]; then
+            filename=$2
+        else
+            filename=$2.md
+        fi
+        echo $NOTES_CLI_HOME/$category/$filename
+    fi
+}
+
+# 絶対パスから現在のカテゴリを取得
+function notescategory() {
+    if [ -n "$1" ]; then
+        echo $1 | sed -e "s@`echo $NOTES_CLI_HOME`/@@g" | sed -e "s@/`echo $(basename $1)`@@g"
+    fi
+}
+
+# notesnewのエイリアス
 # よく間違えるので作った
 function notesadd() {
     notesnew $1 $2 $3
-}
-
-# ファイルが存在するかを返す
-function notesexists() {
-    local cnt
-    if [ -n "$1" ] && [ -n "$2" ]; then
-        cnt=$(notes ls -c $1 | grep -c $2.md)
-        echo $cnt
-    fi
 }
 
 # notesをgrepしてfzfして開く
@@ -437,14 +480,16 @@ function notesgrep() {
         list=$(notes ls `echo ${opts}`)
         if [ -n "$list" ]; then
             # 1行だったらそのまま開く
+            # TODO 1行表示がおかしいため
             cnt=$(notes ls `echo ${opts}` | xargs rg -l -i "$word" | wc -l)
             if [ $cnt = 1 ]; then
-                $EDITOR $(notes ls `echo ${opts}` | xargs rg -l -i "$word")
+                file=$(notes ls `echo ${opts}` | xargs rg -l -i "$word")
+                # $EDITOR "$file"
+                notesopen $file
             else
                 file=$(notes ls `echo ${opts}` | xargs rg -i "$word" | ccat | fzf --height=100% | awk -F: '{print $1}')
                 if [ -n "$file" ]; then
-                    if [ -z "$VIMRUNTIME" ] && cd $NOTES_CLI_HOME  # vimから開いたので無ければカレント変更
-                    $EDITOR "$file"
+                    notesopen $file
                 fi
             fi
         fi
@@ -476,27 +521,14 @@ function noteslist() {
     if [ -n "$list" ]; then
         files=$(notes ls `echo ${opts}` | rg -i $word)
         if [ -n "$files" ]; then
-            #file=$(notes ls `echo ${opts}` | rg -i $word | fzf --preview "bat --color=always --style=header,grid --line-range :100 {}")
             file=$(notes ls `echo ${opts}` | rg -i $word | fzf --height 100% --preview "bat --color=always --style=grid --line-range :100 {}")
             if [ -n "$file" ]; then
-                #if [ -z "$VIMRUNTIME" ] && cd $NOTES_CLI_HOME  # vimから開いたので無ければカレント変更
-                #$EDITOR "$file"
-                if [ -z "$VIMRUNTIME" ]; then
-                    (cd $NOTES_CLI_HOME && $EDITOR "$file")
-                else
-                    $EDITOR "$file"
-                fi
+                notesopen $file
             fi
         fi
     fi
 }
 
-# 現在のカテゴリを絶対パスから取得
-function notescategory() {
-    if [ -n "$1" ]; then
-        echo $1 | sed -e "s@`echo $NOTES_CLI_HOME`/@@g" | sed -e "s@/`echo $(basename $1)`@@g"
-    fi
-}
 
 function notesmove() {
     local new_category
@@ -510,8 +542,6 @@ function notesmove() {
     fi
 
     filefullpath=$(notes ls | fzf)
-    echo $new_category
-    echo $filefullpath
     notesmoveone $new_category $filefullpath
 }
 
@@ -527,10 +557,10 @@ function notesmoveone() {
     local category_key_to
     if [ -n "$1" ] && [ -n "$2" ]; then
         filefullpath_from=$2
-        filename=`echo $(basename $filefullpath_from)`
+        filename=`basename $filefullpath_from`
         category_from=`notescategory $filefullpath_from`
         category_to=$1
-        filefullpath_to="$NOTES_CLI_HOME/$1/$filename"
+        filefullpath_to=`notesfullpath $category_to $filename`
 
         mv $filefullpath_from $filefullpath_to
 
@@ -542,6 +572,89 @@ function notesmoveone() {
         fi
     fi
 }
+
+# fullpathからnote作成
+# notes 機能を使わずにがんばる
+function notesnewbyfullpath() {
+    local filefullpath
+    if [ -n "$1" ]; then
+        filefullpath=$1
+        cp $NOTES_CLI_TEMPLATE $filefullpath
+        notesrestructheader $filefullpath
+    fi
+}
+
+# ファイルパスからheaderを再定義する
+# ヘッダがない場合は作成する
+function notesrestructheader() {
+    local filefullpath
+    local filename
+    local category
+    local title
+    local category_key_from
+    local category_key_to
+    local created_key_from
+    local created_key_to
+    local current_created
+    local header="default\n=====================\n<!--\n- Category: default\n- Tags:\n- Created: default\n-->\n"
+    if [ -n "$1" ]; then
+        filefullpath=$1
+
+        # ファイルパスから正しいカテゴリやタイトルを切り出す
+        filename=`basename $filefullpath`
+        category=`notescategory $filefullpath`
+        date=`echo $filename | sed -r 's/.*([0-9-]{10})\-.*/\1/g'`
+        title=`echo $filename | sed -r 's/(^.*)\.md$/\1/g'`
+
+        if [[ -e $filefullpath ]]; then
+            # headerの確認
+            current_2p=`sed -n 2P $filefullpath`
+            if [ `echo $current_2p | grep '====='` ] ; then  # 2行目に=====があるかどうかで判断 TODO
+                # do nothing
+            else
+                # headerのテンプレートを挿入
+                sed -i -e "1i $header" $filefullpath
+            fi
+
+            # 1行目はタイトル
+            sed -i -e "1d" $filefullpath
+            sed -i -e "1i `echo $title`" $filefullpath
+
+            # カテゴリの置換
+            category_key_from="Category: .*$"
+            category_key_to="Category: $category"
+            sed -i "s@`echo $category_key_from`@`echo $category_key_to`@g" $filefullpath
+
+            # Createdの置換
+            # 1. filenameから取得したdateと、headerのdateが同じ
+            #   -> おそらく正しいのでそのまま使う
+            #
+            # 2. filenameから取得したdateが本日の場合
+            #   -> 現在時刻を入れてしまおう
+            #
+            # 3. filenameから取得したdateが本日ではない場合
+            #   -> なんかおかしいが、headerを書き換えたいのだろう。dateT00:00:00
+
+            # 現在のcreatedを取得
+            current_created=`sed -n 6P $filefullpath | sed -r 's/\- Created: (.*)$/\1/g'`
+            current_created_date=`sed -n 6P $filefullpath | sed -r 's/.*([0-9]{4}\-[0-9]{2}\-[0-9]{2}).*/\1/g'`
+            today_date=`notesdate`
+            if [ $current_created_date = $date ]; then
+                # do nothing
+            else
+                if [ $date = $today_date ]; then
+                    created_key_to="Created: `notesdateiso`"  # 今を入れる
+
+                else
+                    created_key_to="Created: `echo $date`T00:00:00+09:00"
+                fi
+                created_key_from="Created: .*$"
+                sed -i "s@`echo $created_key_from`@`echo $created_key_to`@g" $filefullpath
+            fi
+        fi
+    fi
+}
+
 
 # 日報
 function notesdiary() {
@@ -565,6 +678,11 @@ function notestodo() {
     notesgrep "\[\s\]"
 }
 
+# チェックのついたチェックボックスを検索
+function notesdone() {
+    notesgrep "\[x\]"
+}
+
 # なんとなく合わせる
 function notessave() {
     notes save
@@ -572,26 +690,30 @@ function notessave() {
 
 # pull
 function notespull() {
-(cd $NOTES_CLI_HOME && git pull)
+    (cd $NOTES_CLI_HOME && git pull)
 }
 
 # n で呼び出す
 function n() {
-  if [ -n "$1" ]; then
-    cmd=$1
-    case "$cmd" in
-      "grep" ) notesgrep $2;;
-      "add" ) notesadd $2 $3 $4;;
-      "memo" ) notesmemo;;
-      "diary" ) notesdiary;;
-      "todo" ) notestodo;;
-      "save" ) notessave;;
-      "pull" ) notespull;;
-    esac
-  else
-      # 基本はnoteslist
-      noteslist
-  fi
+    local cmd
+    if [ -n "$1" ]; then
+        cmd=$1
+        case "$cmd" in
+            "list" ) noteslist ${@:2};;
+            "grep" ) notesgrep ${@:2};;
+            "add" ) notesnew $2 $3 $4;;
+            "new" ) notesnew $2 $3 $4;;
+            "memo" ) notesmemo;;
+            "diary" ) notesdiary;;
+            "todo" ) notestodo;;
+            "done" ) notesdone;;
+            "save" ) notessave;;
+            "pull" ) notespull;;
+        esac
+    else
+        # 基本はnoteslist
+        noteslist
+    fi
 }
 
 # WSLのとき時刻合わせを定期的にしないとずれる
@@ -633,7 +755,8 @@ if [ "$ZPLUG_LOAD_FLG" = "1" ]; then
 
     ## 最後
     # tmuxを自動起動。体裁はtmuximumに任せた
-    if [[ ! -n $TMUX && $- == *l* ]]; then
-        tmuximum
-    fi
+    # 2021-12-03 dev環境のtmuxpを手動で起動したいことが多く、ctrl+cをいつも押すので、自動起動をやめた
+    # if [[ ! -n $TMUX && $- == *l* ]]; then
+    #    tmuximum
+    # fi
 fi
