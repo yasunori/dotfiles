@@ -113,7 +113,8 @@ hook_add = '''
           :Denite grep -path=~/notes/clients -buffer-name=search-buffer-denite
         endif
       else
-        :Denite grep -path=~/notes/ -buffer-name=search-buffer-denite
+        " :Denite grep -path=~/notes/ -buffer-name=search-buffer-denite
+        :Denite grep -path=~/notes/
       endif
     endfunction
 
@@ -121,20 +122,20 @@ hook_add = '''
     command! Notesadd :term notesadd
 
     " メモ作成
-    command! -nargs=? Memo call Memo(<f-args>)
-    function! Memo(...)
+    command! -nargs=? Notesmemo call Notesmemo(<f-args>)
+    function! Notesmemo(...)
       if a:0 >= 1
-         exe("term memo " . a:1)
+         exe("term notesmemo " . a:1)
       else
-        :term memo
+        :term notesmemo
       endif
     endfunction
 
     " 今日の日記作成
-    command! Diary :term diary
+    command! Notesdiary :term notesdiary
 
     " TODO検索
-    command! Todo :Denite grep:::'\[\s\]'
+    command! Notestodo :Denite grep:::'\[\s\]'
 
 
     "バッファ一覧
@@ -228,13 +229,43 @@ hook_add = """
 repo = 'othree/eregex.vim'
 
 [[plugins]] # バレットのTABインデント、Leader2回でチェックボックスのトグル
-repo = "violetyk/iikanji-markdown.vim"
+repo = "yasunori/iikanji-markdown.vim"
 hook_add = """
     let g:iikanji#markdown#mapping#toggle_checkbox="<Leader>x"
+    let g:iikanji#markdown#use_indent_with_tab="1"
+    "noremap  <silent><buffer> <Leader><Tab> :call iikanji#markdown#indent_with_tab(1)<CR>
+    "noremap  <silent><buffer> <Leader><S-Tab> :call iikanji#markdown#indent_with_tab(-1)<CR>
+    "inoremap <silent><buffer> <Leader><Tab> <C-o>:call iikanji#markdown#indent_with_tab(1)<CR>
+    "inoremap <silent><buffer> <Leader><S-Tab> <C-o>:call iikanji#markdown#indent_with_tab(-1)<CR>
+    "vnoremap <silent><buffer> <Leader><Tab> :call iikanji#markdown#indent_with_tab(1)<CR>
+    "vnoremap <silent><buffer> <Leader><S-Tab> :call iikanji#markdown#indent_with_tab(-1)<CR>
 """
 
 [[plugins]] # :TableModeToggle
 repo = 'dhruvasagar/vim-table-mode'
+
+[[plugins]]
+repo = 'yasunori/nvim-follow-markdown-links'
+hook_add = """
+    command! FollowMarkdownLink call FollowMarkdownLink(0)
+    command! FollowMarkdownLinkWithNewWindow call FollowMarkdownLink(1)
+    command! PreviousMarkdownBuffer call PreviousMarkdownBuffer()
+    autocmd FileType markdown nnoremap <script> <[-CR> :FollowMarkdownLink<CR>
+    autocmd FileType markdown nnoremap <script> <CR> :FollowMarkdownLinkWithNewWindow<CR>
+    autocmd FileType markdown nnoremap <script> <BS> :PreviousMarkdownBuffer<CR>
+    let g:follow_markdown_links#extensions = ['.md', '.markdown']
+"""
+
+
+#[[plugins]] # markdownのlinkをうまいことするやつ
+#repo = 'alexpearce/nvim-follow-markdown-links'
+#hook_add = """
+#    command! FollowMarkdownLink call FollowMarkdownLink()
+#    command! PreviousMarkdownBuffer call PreviousMarkdownBuffer()
+#    autocmd FileType markdown nnoremap <script> <CR> :FollowMarkdownLink<CR>
+#    autocmd FileType markdown nnoremap <script> <BS> :PreviousMarkdownBuffer<CR>
+#    let g:follow_markdown_links#extensions = ['.md', '.markdown']
+#"""
 
 [[plugins]] # :PreviewMarkdown
 repo = 'skanehira/preview-markdown.vim'
