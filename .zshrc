@@ -302,7 +302,7 @@ case ${OSTYPE} in
         alias t="tmuximum"
 
         #tmuxpのベース用起動。prefix keyが"\"になっている
-        alias tb="tmuxp load tmuxp_base"
+        alias tt="tmuxp load tmuxp_base"
 
         ;;
 esac
@@ -391,7 +391,13 @@ function notesnew() {
     filefullpath=`notesfullpath $category $filename`
     if [ ! -e "$filefullpath" ]; then
         # new
-        notesnewbyfullpath $filefullpath
+        # diary は notesの力を借りようかな
+        # ほかはコピーで作ったほうがはやい
+        if [[ $category =~ ^diary$ ]]; then
+            notes new $category $filename
+        else
+            notesnewbyfullpath $filefullpath
+        fi
     fi
 
     notesopen $filefullpath
