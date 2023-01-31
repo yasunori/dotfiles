@@ -20,7 +20,6 @@ repo  = 'cespare/vim-toml'
 [[plugins]] # color scheme
 repo = 'jacoborus/tender'
 hook_add = '''
-  colorscheme tender
   " colorscheme 設定は source 後に行う必要があるので VimEnter で行う。
   " 但し Colorscheme イベントの発生が抑制されないよう nented を付ける。
   " au MyAutoCmd VimEnter * nested colorscheme tender
@@ -34,6 +33,7 @@ hook_add = '''
 	autocmd Colorscheme * highlight Folded ctermbg=none
 	autocmd Colorscheme * highlight EndOfBuffer ctermbg=none 
   augroup END
+  colorscheme tender
 '''
 
 [[plugins]] # easymotion
