@@ -120,8 +120,8 @@ case ${OSTYPE} in
         export TERM=xterm-256color
 
         # zplug
-        export ZPLUG_HOME=$HOME/.linuxbrew/opt/zplug
-        source $ZPLUG_HOME/init.zsh
+        # export ZPLUG_HOME=$HOME/.linuxbrew/opt/zplug
+        # source $ZPLUG_HOME/init.zsh
 
         #fzf
         PERCOL='fzf'

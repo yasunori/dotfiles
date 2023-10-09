@@ -16,6 +16,9 @@ apply = ["defer"]
 
 [templates]
 defer = "{% for file in files %}zsh-defer source \"{{ file }}\"\n{% endfor %}"
+tmuximum_path = "[[ ! $PATH =~ {{ dir }} ]] && export PATH=\"$PATH:{{ dir }}\"\n"
+# tmuximum_source = "{% for file in files %}chmod +x \"{{ file }}\" \n source \"{{ file }}\"\n{% endfor %}"
+tmuximum_source = "chmod +x {{ dir }}/tmuximum \n source {{ dir }}/tmuximum\n"
 
 [plugins]
 [plugins.zsh-defer]
@@ -24,6 +27,7 @@ apply = ['source']
 
 [plugins.tmuximum]
 github = 'arks22/tmuximum'
+apply = ['tmuximum_path', 'tmuximum_source']
 
 [plugins.zsh-autosuggestions]
 github = 'zsh-users/zsh-autosuggestions'
