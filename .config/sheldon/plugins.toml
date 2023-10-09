@@ -37,7 +37,12 @@ github = 'zsh-users/zsh-syntax-highlighting'
 
 [plugins.dotfiles-defers]
 local = "~/.config/zsh/"
-use = ["{!sync,*}.zsh"]
+use = ["{!00-sync,*}.zsh"]
+
+[plugins.dotfiles-sync]
+local = "~/.config/zsh"
+use = ["00-sync.zsh"]
+apply = ["source"]
 
 # For example:
 #
