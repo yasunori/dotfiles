@@ -7,6 +7,11 @@ if [[ -e ~/dotfiles/bin ]]; then
     export PATH=$HOME/dotfiles/bin:$PATH
 fi
 
+# .local/bin
+if [[ -e ~/.local/bin ]]; then
+    export PATH=$HOME/.local/bin:$PATH
+fi
+
 # python
 if [[ -e ~/.python/current ]]; then
     export PATH=$HOME/.python/current/bin:$PATH
@@ -15,6 +20,8 @@ fi
 if [[ -e ~/.python/current/bin/virtualenvwrapper.sh ]]; then
     source ~/.python/current/bin/virtualenvwrapper.sh
 fi
+
+# poetry
 if [[ -e ~/.poetry ]]; then
     export PATH="$HOME/.poetry/bin:$PATH"
 fi
@@ -134,3 +141,8 @@ case ${OSTYPE} in
 
         ;;
 esac
+
+# fzf
+export FZF_DEFAULT_COMMAND='rg --files --hidden --glob "!.git"'
+#export FZF_DEFAULT_OPTS='--height 40% --reverse'
+export FZF_DEFAULT_OPTS='--color=fg+:11 --height 70% --reverse --exit-0 --multi --bind=ctrl-a:toggle-all --ansi --preview-window noborder'
