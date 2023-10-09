@@ -190,6 +190,11 @@ if [ -n "$WSLENV" ]; then
     sudo hwclock -s
 fi
 
+# linuxbrewを先に読み込む
+if [[ -e ~/.linuxbrew ]]; then
+    export PATH=$HOME/.linuxbrew/bin:$HOME/.linuxbrew/sbin:$PATH
+fi
+
 # sheldon読み込むかどうかの判定
 export ZPLUG_LOAD_FLG="1"
 if [ -n "$VIMRUNTIME" ]; then  # vimからのtermのとき速度向上のためやらない
