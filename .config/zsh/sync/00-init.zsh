@@ -3,6 +3,9 @@
 export LANG=ja_JP.UTF-8
 export ZSHRC_DIR=${${(%):-%N}:A:h}
 
+# neovim等のために、configを設定する
+export XDG_CONFIG_HOME="$HOME/.config"
+
 # 256色使えるように
 export TERM="xterm-256color"
 

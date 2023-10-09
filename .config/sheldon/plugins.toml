@@ -18,7 +18,8 @@ apply = ["defer"]
 defer = "{% for file in files %}zsh-defer source \"{{ file }}\"\n{% endfor %}"
 tmuximum_path = "[[ ! $PATH =~ {{ dir }} ]] && export PATH=\"$PATH:{{ dir }}\"\n"
 # tmuximum_source = "{% for file in files %}chmod +x \"{{ file }}\" \n source \"{{ file }}\"\n{% endfor %}"
-tmuximum_source = "chmod +x {{ dir }}/tmuximum \n source {{ dir }}/tmuximum\n"
+# tmuximum_source = "[[ ! -n $TMUX && $- == *l* ]] && chmod +x {{ dir }}/tmuximum \n source {{ dir }}/tmuximum\n"
+tmuximum_source = "chmod +x {{ dir }}/tmuximum \n[[ ! -n $TMUX && $- == *l* ]] && source {{ dir }}/tmuximum\n"
 
 [plugins]
 [plugins.zsh-defer]
@@ -36,12 +37,12 @@ github = 'zsh-users/zsh-autosuggestions'
 github = 'zsh-users/zsh-syntax-highlighting'
 
 [plugins.dotfiles-defers]
-local = "~/.config/zsh/"
-use = ["{!00-sync,*}.zsh"]
+local = "~/.config/zsh/defer"
+use = ["*.zsh"]
 
 [plugins.dotfiles-sync]
-local = "~/.config/zsh"
-use = ["00-sync.zsh"]
+local = "~/.config/zsh/sync"
+use = ["*.zsh"]
 apply = ["source"]
 
 # For example:
