@@ -360,6 +360,13 @@ repo = 'othree/eregex.vim'
 
 [[plugins]]
 repo = 'ixru/nvim-markdown'
+hook_add = """
+    let g:vim_markdown_folding_disabled = 1
+    autocmd FileType markdown nnoremap <buffer> <TAB> >>
+    autocmd FileType markdown nnoremap <buffer> <S-TAB> <<
+    autocmd FileType markdown vnoremap <buffer> <TAB> >>
+    autocmd FileType markdown vnoremap <buffer> <S-TAB> <<
+"""
 
 
 [[plugins]] # :TableModeToggle
