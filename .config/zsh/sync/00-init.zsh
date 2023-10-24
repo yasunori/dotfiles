@@ -70,6 +70,18 @@ zstyle ':zle:*' word-chars " /=;@:{},|"
 zstyle ':zle:*' word-style unspecified
 
 
+# コマンド履歴に追加する条件を指定する
+# cf. https://mollifier.hatenablog.com/entry/20090728/p1
+zshaddhistory() {
+    local line=${1%%$'\n'}
+    local cmd=${line%% *}
+
+    # 以下の条件をすべて満たすものだけをヒストリに追加する
+    [[ ${#line} -ge 1
+        && ${cmd} != (n|notes)
+        && ${cmd} != (m|man)
+    ]]
+}
 
 ########################################
 # vcs_info
