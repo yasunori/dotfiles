@@ -18,6 +18,9 @@ let mapleader = "\<Space>"
 "    augroup END
 "endif"
 
+" マウスいらない
+set mouse=
+
 " filetype検出
 filetype on
 
@@ -135,9 +138,68 @@ tnoremap <silent> <leader><ESC> <C-\><C-n>
 " terminal insertモードではじめる
 autocmd TermOpen * startinsert
 
+
 " スクリプト直接実行
 "function! s:Exec()
 "   exe "!" . &ft . " %"
 ":endfunction
 "command! Exec call <SID>Exec()
 "map <silent> <C-P> :call <SID>Exec()<CR>
+
+
+" terminalのトグルをctrl+tでやる
+" 要 split-term
+" cf. https://zenn.dev/taro0079/articles/6094881dcadf4d
+let g:terminal_bufnr = -1
+function! ToggleTerminal()
+  if &buftype == 'terminal'
+    " If the current buffer is a terminal, go back to the previous buffer
+    execute "buffer #"
+    execute "close"
+  else
+    " If the current buffer is not a terminal, try to find the terminal buffer
+    if bufexists(g:terminal_bufnr)
+      " If the terminal buffer exists, switch to it
+      execute 'split'
+      execute "buffer " . g:terminal_bufnr
+      execute "normal i"
+
+    else
+      " If no terminal buffer exists, create a new one and save its buffer number
+      " terminal
+      Term
+      let g:terminal_bufnr = bufnr('%')
+    endif
+
+  endif
+
+endfunction
+
+" nnoremap <silent> <C-t> :call ToggleTerminal()<CR>
+" tnoremap <silent> <C-t> <C-\><C-n>:call ToggleTerminal()<CR>
+nnoremap <silent> <C-]> :call ToggleTerminal()<CR>
+tnoremap <silent> <C-]> <C-\><C-n>:call ToggleTerminal()<CR>
+
+
+" ウィンドウ最大化のトグル
+" cf. https://qiita.com/grohiro/items/e3dbcc93510bc8c4c812
+let g:toggle_window_size = 0
+function! ToggleWindowSize()
+  if g:toggle_window_size == 1
+    exec "normal \<C-w>="
+    let g:toggle_window_size = 0
+  else
+    :resize
+    :vertical resize
+    let g:toggle_window_size = 1
+  endif
+endfunction
+nnoremap <silent> <A-m> :call ToggleWindowSize()<CR>
+tnoremap <silent> <A-m> <C-\><C-n>:call ToggleWindowSize()<CR>
+
+
+" terminalモードでctrl+w 系使う
+tnoremap <C-W>j <cmd>wincmd j<cr>
+tnoremap <C-W>k <cmd>wincmd k<cr>
+tnoremap <C-W>h <cmd>wincmd h<cr>
+tnoremap <C-W>l <cmd>wincmd l<cr>
