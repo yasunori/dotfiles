@@ -39,6 +39,12 @@ hook_add = '''
 [[plugins]] # easymotion
 repo = 'easymotion/vim-easymotion'
 
+[[plugins]] # copilot
+repo = 'github/copilot.vim'
+hook_add = '''
+   let g:copilot_node_command = '~/.nodebrew/node/v16.10.0/bin/node'
+'''
+
 [[plugins]] # denite
 repo = 'Shougo/denite.nvim'
 hook_add = '''
@@ -165,20 +171,67 @@ hook_add = '''
 
 '''
 
-[[plugins]] # NerdTree
-repo = 'scrooloose/nerdtree'
+#[[plugins]] # NerdTree
+#repo = 'scrooloose/nerdtree'
+# hook_add = '''
+#    noremap nt :NERDTreeToggle<CR>
+#    let file_name = expand("%")
+#	let NERDTreeShowHidden = 1
+#    let g:NERDTreeWinSize=26
+#    "if has('vim_starting') &&  file_name == ""
+#    "    autocmd VimEnter * NERDTree ./
+#    "endif
+#'''
+
+#[[plugins]]
+#repo = 'Xuyuanp/nerdtree-git-plugin'
+
+
+[[plugins]]
+repo = 'lambdalisue/fern.vim'
 hook_add = '''
-    noremap nt :NERDTreeToggle<CR>
-    let file_name = expand("%")
-	let NERDTreeShowHidden = 1
-    let g:NERDTreeWinSize=26
-    "if has('vim_starting') &&  file_name == ""
-    "    autocmd VimEnter * NERDTree ./
-    "endif
+let g:fern#default_hidden=1
+" Show file tree with Ctrl+n
+nnoremap nt :Fern . -reveal=% -drawer -toggle -width=40<CR>
+function! s:init_fern() abort
+  nmap <buffer> <Plug>(fern-action-trash) <Plug>(fern-action-remove)
+
+  nmap <buffer><expr>
+      \ <Plug>(fern-my-expand-or-collapse)
+      \ fern#smart#leaf(
+      \   "\<Plug>(fern-action-collapse)",
+      \   "\<Plug>(fern-action-expand)",
+      \   "\<Plug>(fern-action-collapse)",
+      \ )
+  nmap <buffer><nowait> <Leader> <Plug>(fern-action-open-or-expand)
+  nmap <buffer><nowait> <CR> <Plug>(fern-action-open-or-expand)
+  nmap <buffer><nowait> <C-l> <Plug>(fern-action-open-or-enter)
+
+endfunction
+
+augroup fern-custom
+  autocmd! *
+  autocmd FileType fern call s:init_fern()
+augroup END
 '''
 
 [[plugins]]
-repo = 'Xuyuanp/nerdtree-git-plugin'
+repo = 'lambdalisue/fern-git-status.vim'
+
+
+[[plugins]]
+repo = 'LumaKernel/fern-mapping-reload-all.vim'
+depends = ['fern.vim']
+hook_add = '''
+function s:init_fern_mapping_reload_all()
+    nmap <buffer> r <Plug>(fern-action-reload:all)
+endfunction
+augroup my-fern-mapping-reload-all
+    autocmd! *
+    autocmd FileType fern call s:init_fern_mapping_reload_all()
+augroup END
+'''
+
 
 [[plugins]] # Indent Guides
 repo = 'nathanaelkane/vim-indent-guides'
@@ -190,6 +243,45 @@ hook_add = '''
     autocmd VimEnter,Colorscheme * :hi IndentGuidesOdd  ctermbg=234
     autocmd VimEnter,Colorscheme * :hi IndentGuidesEven ctermbg=236
 '''
+
+#[[plugins]]
+#repo = 'lambdalisue/nerdfont.vim'
+#[[plugins]]
+#repo = 'lambdalisue/fern-renderer-nerdfont.vim'
+#hook_add = '''
+#  let g:fern#renderer = 'nerdfont'
+#'''
+#[[plugins]]
+#repo = 'lambdalisue/glyph-palette.vim'
+#hook_add = '''
+#  augroup my-glyph-palette
+#    autocmd! *
+#    autocmd FileType fern call glyph_palette#apply()
+#    autocmd FileType nerdtree,startify call glyph_palette#apply()
+#  augroup END
+#'''
+
+[[plugins]]
+repo = 'airblade/vim-gitgutter'
+hook_add = '''
+"" git操作
+" g]で前の変更箇所へ移動する
+nnoremap g[ :GitGutterPrevHunk<CR>
+" g[で次の変更箇所へ移動する
+nnoremap g] :GitGutterNextHunk<CR>
+" ghでdiffをハイライトする
+nnoremap gh :GitGutterLineHighlightsToggle<CR>
+" gpでカーソル行のdiffを表示する
+nnoremap gp :GitGutterPreviewHunk<CR>
+" 記号の色を変更する
+highlight GitGutterAdd ctermfg=green
+highlight GitGutterChange ctermfg=blue
+highlight GitGutterDelete ctermfg=red
+
+"" 反映時間を短くする(デフォルトは4000ms)
+set updatetime=250
+'''
+
 
 #[[plugins]]
 #repo = 'autozimu/LanguageClient-neovim'
@@ -217,7 +309,6 @@ hook_add = """
       \ 'coc-jedi',
       \ 'coc-diagnostic',
       \ 'coc-json',
-      \ 'coc-tabnine',
       \ 'coc-tsserver',
       \ ]
 
@@ -233,23 +324,43 @@ hook_add = """
     endfunction
 
     inoremap <expr> <cr> pumvisible() ? "\<C-y>" : "\<C-g>u\<CR>"
+
+    nmap <silent> gd <Plug>(coc-definition)
+    nmap <silent> gy <Plug>(coc-type-definition)
+    nmap <silent> gi <Plug>(coc-implementation)
+    nmap <silent> gr <Plug>(coc-references)
+    nnoremap <silent> K :call <SID>show_documentation()<CR>
+
+    function! s:show_documentation()
+      if (index(['vim','help'], &filetype) >= 0)
+        execute 'h '.expand('<cword>')
+      else
+        call CocAction('doHover')
+      endif
+    endfunction
 """
 
 [[plugins]] # :%S で/perl風正規表現
 repo = 'othree/eregex.vim'
 
-[[plugins]] # バレットのTABインデント、Leader2回でチェックボックスのトグル
-repo = "yasunori/iikanji-markdown.vim"
-hook_add = """
-    let g:iikanji#markdown#mapping#toggle_checkbox="<Leader>x"
-    let g:iikanji#markdown#use_indent_with_tab="1"
-    "noremap  <silent><buffer> <Leader><Tab> :call iikanji#markdown#indent_with_tab(1)<CR>
-    "noremap  <silent><buffer> <Leader><S-Tab> :call iikanji#markdown#indent_with_tab(-1)<CR>
-    "inoremap <silent><buffer> <Leader><Tab> <C-o>:call iikanji#markdown#indent_with_tab(1)<CR>
-    "inoremap <silent><buffer> <Leader><S-Tab> <C-o>:call iikanji#markdown#indent_with_tab(-1)<CR>
-    "vnoremap <silent><buffer> <Leader><Tab> :call iikanji#markdown#indent_with_tab(1)<CR>
-    "vnoremap <silent><buffer> <Leader><S-Tab> :call iikanji#markdown#indent_with_tab(-1)<CR>
-"""
+# [[plugins]] # バレットのTABインデント、Leader2回でチェックボックスのトグル
+# repo = "yasunori/iikanji-markdown.vim"
+# hook_add = """
+#     let g:iikanji#markdown#mapping#toggle_checkbox="<Leader>x"
+#     let g:iikanji#markdown#use_indent_with_tab="1"
+#    let g:iikanji#markdown#use_abbrev="0"
+#    let g:iikanji#markdown#abbrev={}
+#    noremap  <silent><buffer> <Leader><Tab> :call iikanji#markdown#indent_with_tab(1)<CR>
+#    noremap  <silent><buffer> <Leader><S-Tab> :call iikanji#markdown#indent_with_tab(-1)<CR>
+#    inoremap <silent><buffer> <Leader><Tab> <C-o>:call iikanji#markdown#indent_with_tab(1)<CR>
+#    inoremap <silent><buffer> <Leader><S-Tab> <C-o>:call iikanji#markdown#indent_with_tab(-1)<CR>
+#    vnoremap <silent><buffer> <Leader><Tab> :call iikanji#markdown#indent_with_tab(1)<CR>
+#    vnoremap <silent><buffer> <Leader><S-Tab> :call iikanji#markdown#indent_with_tab(-1)<CR>
+#"""
+
+[[plugins]]
+repo = 'ixru/nvim-markdown'
+
 
 [[plugins]] # :TableModeToggle
 repo = 'dhruvasagar/vim-table-mode'
@@ -288,6 +399,7 @@ hook_add = """
 repo = 'vimlab/split-term.vim'
 hook_add = """
     set splitright
+    set splitbelow
     let g:split_term_default_shell = "zsh"
     let g:disable_key_mappings="<ESC>"
 """
