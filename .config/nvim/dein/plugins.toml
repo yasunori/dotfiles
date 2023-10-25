@@ -1,10 +1,25 @@
 [[plugins]]
 repo = 'Shougo/dein.vim'
 
+
+# ステータスバーにgit出したいので
+[[plugins]]
+repo = 'tpope/vim-fugitive'
+
+
 [[plugins]] # ステータスバー
 repo = 'itchyny/lightline.vim'
 hook_add = '''
-    let g:lightline = {'colorscheme': 'wombat'}
+    let g:lightline = {
+      \ 'colorscheme': 'wombat',
+      \ 'active': {
+      \   'left': [ [ 'mode', 'paste' ],
+      \             [ 'gitbranch', 'readonly', 'filename', 'modified' ] ]
+      \ },
+      \ 'component_function': {
+      \   'gitbranch': 'FugitiveHead',
+      \ },
+      \ }
 '''
 
 [[plugins]] # deniteに必要
