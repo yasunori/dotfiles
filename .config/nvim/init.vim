@@ -10,13 +10,16 @@ let mapleader = "\<Space>"
 "set clipboard&
 "set clipboard^=unnamedplus
 
-" こちらはvim->windowsうまくいったが遅かったので一旦コメントアウト
-"if system('uname -a | grep microsoft') != ''
-"    augroup myYank
-"        autocmd!
-"        autocmd TextYankPost * :call system('clip.exe', @")
-"    augroup END
-"endif"
+" vim->windowsのクリップボードコピー
+function! WinClip() abort
+    if system('uname -a | grep microsoft') != ''
+        augroup myYank
+            autocmd!
+            autocmd TextYankPost * :call system('clip.exe', @")
+        augroup END
+    endif
+endfunction
+command WinClip call WinClip()
 
 " マウスいらない
 set mouse=
@@ -30,7 +33,7 @@ let $CONFIG = empty($XDG_CONFIG_HOME) ? expand('$HOME/.config') : $XDG_CONFIG_HO
 let $DATA = empty($XDG_DATA_HOME) ? expand('$HOME/.local/share') : $XDG_DATA_HOME
 
 " デフォルトのpython
-let g:python3_host_prog = expand('$HOME/.python/current/bin/python')
+let g:python3_host_prog = expand('$HOME/.python/nvim/bin/python')
 
 " Load rc file
 function! s:load(file) abort
@@ -203,3 +206,4 @@ tnoremap <C-W>j <cmd>wincmd j<cr>
 tnoremap <C-W>k <cmd>wincmd k<cr>
 tnoremap <C-W>h <cmd>wincmd h<cr>
 tnoremap <C-W>l <cmd>wincmd l<cr>
+
