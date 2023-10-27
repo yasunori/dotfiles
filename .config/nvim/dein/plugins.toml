@@ -297,6 +297,22 @@ highlight GitGutterDelete ctermfg=red
 set updatetime=250
 '''
 
+[[plugins]]
+repo = 'ap/vim-buftabline'
+hook_add = '''
+nnoremap <A-l> :bnext<CR>
+nnoremap <A-h> :bprev<CR>
+nmap <A-1> <Plug>BufTabLine.Go(1)
+nmap <A-2> <Plug>BufTabLine.Go(2)
+nmap <A-3> <Plug>BufTabLine.Go(3)
+nmap <A-4> <Plug>BufTabLine.Go(4)
+nmap <A-5> <Plug>BufTabLine.Go(5)
+nmap <A-6> <Plug>BufTabLine.Go(6)
+nmap <A-7> <Plug>BufTabLine.Go(7)
+nmap <A-8> <Plug>BufTabLine.Go(8)
+nmap <A-9> <Plug>BufTabLine.Go(9)
+nmap <A-0> <Plug>BufTabLine.Go(10)
+'''
 
 #[[plugins]]
 #repo = 'autozimu/LanguageClient-neovim'
@@ -374,30 +390,130 @@ repo = 'othree/eregex.vim'
 #"""
 
 [[plugins]]
+repo = 'mattn/vim-sonictemplate'
+hook_add = """
+let g:sonictemplate_vim_template_dir = '$HOME/.config/nvim/template'
+
+" Notesのリンク作成
+autocmd FileType markdown nnoremap <buffer> <Leader>ni :Template notes-link<CR>
+" Notesのデフォルト作成
+autocmd FileType markdown nnoremap <buffer> <Leader>np :Template notes<CR>
+"""
+
+[[plugins]]
 repo = 'ixru/nvim-markdown'
 hook_add = """
     let g:vim_markdown_folding_disabled = 1
+    " リンクを別窓で開きたいのだけど効いてなさそう
+    let g:vim_markdown_edit_url_in = 'vsplit'
+    
+    " 自分でリマップする
+    let g:vim_markdown_no_default_key_mappings = 1
+
+    autocmd FileType markdown nnoremap <buffer> ]] <Plug>Markdown_MoveToNextHeader
+    autocmd FileType markdown vnoremap <buffer> ]] <Plug>Markdown_MoveToNextHeader
+    autocmd FileType markdown nnoremap <buffer> [[ <Plug>Markdown_MoveToPreviousHeader
+    autocmd FileType markdown vnoremap <buffer> [[ <Plug>Markdown_MoveToPreviousHeader
+    autocmd FileType markdown nnoremap <buffer> ][ <Plug>Markdown_MoveToNextSiblingHeader
+    autocmd FileType markdown vnoremap <buffer> ][ <Plug>Markdown_MoveToNextSiblingHeader
+    autocmd FileType markdown nnoremap <buffer> ]u <Plug>Markdown_MoveToParentHeader
+    autocmd FileType markdown vnoremap <buffer> ]u <Plug>Markdown_MoveToParentHeader
+    autocmd FileType markdown nnoremap <buffer> ]c <Plug>Markdown_MoveToCurHeader
+    autocmd FileType markdown vnoremap <buffer> ]c <Plug>Markdown_MoveToCurHeader
+
+    autocmd FileType markdown nnoremap <buffer> <Leader>x <Plug>Markdown_Checkbox
+
+    autocmd FileType markdown inoremap <buffer> <C-k> <Plug>Markdown_CreateLink
+    autocmd FileType markdown vnoremap <buffer> <C-k> <Plug>Markdown_CreateLink
+
+    autocmd FileType markdown nnoremap <buffer> <CR> <Plug>Markdown_FollowLink
+
+    autocmd FileType markdown nnoremap <buffer> o <Plug>Markdown_NewLineBelow
+    autocmd FileType markdown nnoremap <buffer> O <Plug>Markdown_NewLineAbove
+    autocmd FileType markdown inoremap <buffer> <CR> <Plug>Markdown_NewLineBelow
+
+    " このプラグインのTABは切った。
+    " このプラグインには関係無いが、バレットの行はtabでインデントしたい
+    " バレット以外の行ではそのままタブを入れる
+    autocmd FileType markdown inoremap <buffer> <expr> <TAB> IndentWithTab(1)
+    autocmd FileType markdown inoremap <buffer> <expr> <S-TAB> IndentWithTab(-1)
     autocmd FileType markdown nnoremap <buffer> <TAB> >>
     autocmd FileType markdown nnoremap <buffer> <S-TAB> <<
     autocmd FileType markdown vnoremap <buffer> <TAB> >>
     autocmd FileType markdown vnoremap <buffer> <S-TAB> <<
+
+    function! IndentWithTab(arrow) abort
+      let l = getline('.')
+      if l =~ '^\s*[\-\+\*]'
+        if a:arrow > 0
+          return "\<C-T>"
+        else
+          return "\<C-D>"
+        endif
+      else
+        return "\<Tab>"
+      end
+    endfunction
+
+
+    " ファイルを順番に開きたい
+    " diaryのmdを眺めるときとかに便利
+    function! OpenRelativeFileInDirectory(direction)
+      " 現在開いているファイルのフルパスを取得
+      let current_file = expand('%:p')
+      " ディレクトリのパスを取得
+      let dir = expand('%:p:h')
+      " ディレクトリ内のすべてのファイルを取得（隠しファイルを除く）
+      let files = sort(globpath(dir, '*', 0, 1))
+
+      if a:direction == 'latest'
+        if len(files) <= 0
+          echo "No newer files found"
+          return
+        endif
+        execute 'edit ' . fnameescape(files[len(files)-1])
+        return
+      endif
+
+      " 現在開いているファイルのインデックスを見つける
+      let index = index(files, current_file)
+      " ファイルが見つからない場合は終了
+      if index == -1
+        echo "Current file not found in directory"
+        return
+      endif
+
+      " 次、または前のファイルを開く
+      let new_index = index + a:direction
+      if new_index < 0 || new_index >= len(files)
+        echo "No more files in that direction"
+        return
+      endif
+
+      execute 'edit ' . fnameescape(files[new_index])
+    endfunction
+
+    command! -nargs=1 OpenRelativeFileInDirectory call OpenRelativeFileInDirectory(<args>)
+    autocmd FileType markdown nnoremap <silent> <C-Up> :OpenRelativeFileInDirectory 1<CR>
+    autocmd FileType markdown nnoremap <silent> <C-Down> :OpenRelativeFileInDirectory -1<CR>
+    autocmd FileType markdown nnoremap <silent> <C-PageUp> :OpenRelativeFileInDirectory 'latest'<CR>
 """
 
 
 [[plugins]] # :TableModeToggle
 repo = 'dhruvasagar/vim-table-mode'
 
-[[plugins]]
-repo = 'yasunori/nvim-follow-markdown-links'
-hook_add = """
-    command! FollowMarkdownLink call FollowMarkdownLink(0)
-    command! FollowMarkdownLinkWithNewWindow call FollowMarkdownLink(1)
-    command! PreviousMarkdownBuffer call PreviousMarkdownBuffer()
-    autocmd FileType markdown nnoremap <script> <[-CR> :FollowMarkdownLink<CR>
-    autocmd FileType markdown nnoremap <script> <CR> :FollowMarkdownLinkWithNewWindow<CR>
-    autocmd FileType markdown nnoremap <script> <BS> :PreviousMarkdownBuffer<CR>
-    let g:follow_markdown_links#extensions = ['.md', '.markdown']
-"""
+#[[plugins]]
+#repo = 'yasunori/nvim-follow-markdown-links'
+#hook_add = """
+#    command! FollowMarkdownLink call FollowMarkdownLink(0)
+#    command! FollowMarkdownLinkWithNewWindow call FollowMarkdownLink(1)
+#    command! PreviousMarkdownBuffer call PreviousMarkdownBuffer()
+#    autocmd FileType markdown nnoremap <script> <[-CR> :FollowMarkdownLink<CR>
+#    autocmd FileType markdown nnoremap <script> <CR> :FollowMarkdownLinkWithNewWindow<CR>
+#    autocmd FileType markdown nnoremap <script> <BS> :PreviousMarkdownBuffer<CR>
+#    let g:follow_markdown_links#extensions = ['.md', '.markdown']
+#"""
 
 
 #[[plugins]] # markdownのlinkをうまいことするやつ
