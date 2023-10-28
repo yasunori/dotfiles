@@ -3,7 +3,7 @@ repo = 'Shougo/dein.vim'
 
 
 # Gitでいろいろできるが
-# ステータスバーにgit出したい
+# ステータスバーにgit出したいため
 [[plugins]]
 repo = 'tpope/vim-fugitive'
 
@@ -290,21 +290,20 @@ hook_add = '''
 #  augroup END
 #'''
 
+# gitのdiffを表示したり、hunkを使いやすくする
 [[plugins]]
 repo = 'airblade/vim-gitgutter'
 hook_add = '''
-" キーをいったん削除(git hunkとか使わないし、leader + h がバッファ移動と被って動作遅くなった)
+" キーをいったん削除
 let g:gitgutter_map_keys = 0
 "" git操作
-" g]で前の変更箇所へ移動する
-nnoremap g[ :GitGutterPrevHunk<CR>
-" g[で次の変更箇所へ移動する
-nnoremap g] :GitGutterNextHunk<CR>
-" ghでdiffをハイライトする
+nnoremap g[ <Plug>(GitGutterPrevHunk)
+nnoremap g] <Plug>(GitGutterNextHunk)
 nnoremap gh :GitGutterLineHighlightsToggle<CR>
-" gpでカーソル行のdiffを表示する
-nnoremap gp :GitGutterPreviewHunk<CR>
-" 記号の色を変更する
+nnoremap gs <Plug>(GitGutterStageHunk)
+nnoremap gu <Plug>(GitGutterUndoHunk)
+nnoremap gp <Plug>(GitGutterPreviewHunk)
+" 色変更
 highlight GitGutterAdd ctermfg=green
 highlight GitGutterChange ctermfg=blue
 highlight GitGutterDelete ctermfg=red
