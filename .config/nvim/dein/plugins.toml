@@ -2,7 +2,8 @@
 repo = 'Shougo/dein.vim'
 
 
-# ステータスバーにgit出したいので
+# Gitでいろいろできるが
+# ステータスバーにgit出したい
 [[plugins]]
 repo = 'tpope/vim-fugitive'
 
@@ -17,9 +18,21 @@ hook_add = '''
       \             [ 'gitbranch', 'readonly', 'filename', 'modified' ] ]
       \ },
       \ 'component_function': {
-      \   'gitbranch': 'FugitiveHead',
+      \   'gitbranch': 'MyFugitiveHead',
       \ },
       \ }
+
+function! MyFugitiveHead()
+  try
+    if &ft !~? 'vimfiler\|gundo' && exists('*FugitiveHead')
+      let _ = FugitiveHead()
+      let gg = "\<Char-0xe0a0> "
+      return strlen(_) ? gg._ : ''
+    endif
+  catch
+  endtry
+  return ''
+endfunction
 '''
 
 [[plugins]] # deniteに必要
@@ -261,6 +274,7 @@ hook_add = '''
 
 #[[plugins]]
 #repo = 'lambdalisue/nerdfont.vim'
+
 #[[plugins]]
 #repo = 'lambdalisue/fern-renderer-nerdfont.vim'
 #hook_add = '''
@@ -279,6 +293,8 @@ hook_add = '''
 [[plugins]]
 repo = 'airblade/vim-gitgutter'
 hook_add = '''
+" キーをいったん削除(git hunkとか使わないし、leader + h がバッファ移動と被って動作遅くなった)
+let g:gitgutter_map_keys = 0
 "" git操作
 " g]で前の変更箇所へ移動する
 nnoremap g[ :GitGutterPrevHunk<CR>
@@ -300,18 +316,24 @@ set updatetime=250
 [[plugins]]
 repo = 'ap/vim-buftabline'
 hook_add = '''
-nnoremap <A-l> :bnext<CR>
-nnoremap <A-h> :bprev<CR>
-nmap <A-1> <Plug>BufTabLine.Go(1)
-nmap <A-2> <Plug>BufTabLine.Go(2)
-nmap <A-3> <Plug>BufTabLine.Go(3)
-nmap <A-4> <Plug>BufTabLine.Go(4)
-nmap <A-5> <Plug>BufTabLine.Go(5)
-nmap <A-6> <Plug>BufTabLine.Go(6)
-nmap <A-7> <Plug>BufTabLine.Go(7)
-nmap <A-8> <Plug>BufTabLine.Go(8)
-nmap <A-9> <Plug>BufTabLine.Go(9)
-nmap <A-0> <Plug>BufTabLine.Go(10)
+let g:buftabline_numbers = 2
+highlight BufTabLineCurrent guifg=#d4d4d9 ctermfg=188 guibg=#89898c ctermbg=240 gui=NONE cterm=NONE
+highlight BufTabLineActive guifg=#afafb2 ctermfg=145 guibg=#3e3e40 ctermbg=236 gui=NONE cterm=NONE
+highlight BufTabLineHidden guifg=#89898c ctermfg=245 guibg=#3e3e40 ctermbg=236 gui=NONE cterm=NONE
+highlight BufTabLineFill guifg=NONE ctermfg=NONE guibg=#252527 ctermbg=235 gui=NONE cterm=NONE
+
+nnoremap <Leader>l :bnext<CR>
+nnoremap <Leader>h :bprev<CR>
+nmap <Leader>1 <Plug>BufTabLine.Go(1)
+nmap <Leader>2 <Plug>BufTabLine.Go(2)
+nmap <Leader>3 <Plug>BufTabLine.Go(3)
+nmap <Leader>4 <Plug>BufTabLine.Go(4)
+nmap <Leader>5 <Plug>BufTabLine.Go(5)
+nmap <Leader>6 <Plug>BufTabLine.Go(6)
+nmap <Leader>7 <Plug>BufTabLine.Go(7)
+nmap <Leader>8 <Plug>BufTabLine.Go(8)
+nmap <Leader>9 <Plug>BufTabLine.Go(9)
+nmap <Leader>0 <Plug>BufTabLine.Go(0)
 '''
 
 #[[plugins]]
