@@ -150,7 +150,7 @@ function notesgrep() {
                 # $EDITOR "$file"
                 notesopen $file
             else
-                file=$(notes ls `echo ${opts}` | xargs rg -i "$word" | ccat | fzf --height=100% | awk -F: '{print $1}')
+                file=$(notes ls `echo ${opts}` | xargs rg -i "$word" | rg -v -e 'remove' | ccat | fzf --height=100% | awk -F: '{print $1}')
                 if [ -n "$file" ]; then
                     notesopen $file
                 fi
