@@ -36,7 +36,6 @@ highlight GitGutterDelete ctermfg=red
 set updatetime=250
 '''
 
-# cf. https://qiita.com/yuyuchu3333/items/20a0acfe7e0d0e167ccc
 [[plugins]] # ステータスバー
 repo = 'itchyny/lightline.vim'
 hook_add = '''
@@ -44,11 +43,10 @@ hook_add = '''
       \ 'colorscheme': 'wombat',
       \ 'active': {
       \   'left': [ [ 'mode', 'paste' ],
-      \             [ 'gitbranch', 'gitstatus', 'readonly', 'filename', 'modified' ] ]
+      \             [ 'gitbranch', 'readonly', 'filename', 'modified' ] ]
       \ },
       \ 'component_function': {
       \   'gitbranch': 'MyFugitiveHead',
-      \   'gitstatus': 'GitStatus',
       \ },
       \ }
 
@@ -62,11 +60,6 @@ function! MyFugitiveHead()
   catch
   endtry
   return ''
-endfunction
-
-function! GitStatus()
-  let [a,m,r] = GitGutterGetHunkSummary()
-  return printf('+%d ~%d -%d', a, m, r)
 endfunction
 '''
 
