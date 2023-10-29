@@ -9,7 +9,6 @@ repo = 'Shougo/dein.vim'
 [[plugins]]
 repo = 'tpope/vim-fugitive'
 hook_add = '''
-nnoremap <Leader>gd :Gdiffsplit<CR>
 '''
 
 
