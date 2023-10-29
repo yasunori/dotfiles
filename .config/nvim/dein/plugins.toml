@@ -4,9 +4,37 @@ repo = 'Shougo/dein.vim'
 
 # Gitでいろいろできるが
 # ステータスバーにgit出したいため
+# あとよく使う
+# cf. https://qiita.com/tashua314/items/35521f9bada5fe00cca7
 [[plugins]]
 repo = 'tpope/vim-fugitive'
+hook_add = '''
+nnoremap <Leader>gd :Gdiffsplit<CR>
+'''
 
+
+# gitのdiffを表示したり、hunkを使いやすくする
+[[plugins]]
+repo = 'airblade/vim-gitgutter'
+hook_add = '''
+" キーをいったん削除
+let g:gitgutter_map_keys = 0
+"" git操作
+nnoremap g[ <Plug>(GitGutterPrevHunk)
+nnoremap g] <Plug>(GitGutterNextHunk)
+nnoremap <Leader>gh :GitGutterLineHighlightsToggle<CR>
+nnoremap <Leader>gs <Plug>(GitGutterStageHunk)
+nnoremap <Leader>gu <Plug>(GitGutterUndoHunk)
+nnoremap <Leader>gp <Plug>(GitGutterPreviewHunk)
+
+" 色変更
+highlight GitGutterAdd ctermfg=green
+highlight GitGutterChange ctermfg=blue
+highlight GitGutterDelete ctermfg=red
+
+"" 反映時間を短くする(デフォルトは4000ms)
+set updatetime=250
+'''
 
 [[plugins]] # ステータスバー
 repo = 'itchyny/lightline.vim'
@@ -290,27 +318,6 @@ hook_add = '''
 #  augroup END
 #'''
 
-# gitのdiffを表示したり、hunkを使いやすくする
-[[plugins]]
-repo = 'airblade/vim-gitgutter'
-hook_add = '''
-" キーをいったん削除
-let g:gitgutter_map_keys = 0
-"" git操作
-nnoremap g[ <Plug>(GitGutterPrevHunk)
-nnoremap g] <Plug>(GitGutterNextHunk)
-nnoremap gh :GitGutterLineHighlightsToggle<CR>
-nnoremap gs <Plug>(GitGutterStageHunk)
-nnoremap gu <Plug>(GitGutterUndoHunk)
-nnoremap gp <Plug>(GitGutterPreviewHunk)
-" 色変更
-highlight GitGutterAdd ctermfg=green
-highlight GitGutterChange ctermfg=blue
-highlight GitGutterDelete ctermfg=red
-
-"" 反映時間を短くする(デフォルトは4000ms)
-set updatetime=250
-'''
 
 [[plugins]]
 repo = 'ap/vim-buftabline'
