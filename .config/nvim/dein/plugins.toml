@@ -30,7 +30,7 @@ nnoremap <leader>gd :Gvdiffsplit<CR>
 "nnoremap <leader>gf :Git fetch<CR>
 "nnoremap <leader>gm :Git merge<CR>
 " 当時のファイル遡れるので使いやすい
-nnoremap <leader>gi :tab sp<CR>:0Gclog<CR>
+nnoremap <leader>gh :tab sp<CR>:0Gclog<CR>
 '''
 
 # コミットブラウザ
@@ -52,10 +52,10 @@ let g:gitgutter_map_keys = 0
 "" git操作
 nnoremap g[ <Plug>(GitGutterPrevHunk)
 nnoremap g] <Plug>(GitGutterNextHunk)
-nnoremap <Leader>ghh :GitGutterLineHighlightsToggle<CR>
-nnoremap <Leader>ghs <Plug>(GitGutterStageHunk)
-nnoremap <Leader>ghu <Plug>(GitGutterUndoHunk)
-nnoremap <Leader>ghp <Plug>(GitGutterPreviewHunk)
+nnoremap <Leader>hh :GitGutterLineHighlightsToggle<CR>
+nnoremap <Leader>hs <Plug>(GitGutterStageHunk)
+nnoremap <Leader>hu <Plug>(GitGutterUndoHunk)
+nnoremap <Leader>hp <Plug>(GitGutterPreviewHunk)
 
 " 色変更
 highlight GitGutterAdd ctermfg=green
@@ -366,8 +366,8 @@ let g:buftabline_numbers = 2
 "highlight BufTabLineHidden guifg=#89898c ctermfg=245 guibg=#3e3e40 ctermbg=236 gui=NONE cterm=NONE
 "highlight BufTabLineFill guifg=NONE ctermfg=NONE guibg=#252527 ctermbg=235 gui=NONE cterm=NONE
 
-nnoremap <Leader>l :bnext<CR>
-nnoremap <Leader>h :bprev<CR>
+"nnoremap <Leader>l :bnext<CR>
+"nnoremap <Leader>h :bprev<CR>
 nnoremap <C-l> :bnext<CR>
 nnoremap <C-h> :bprev<CR>
 nnoremap <Leader>x :bd<CR>
