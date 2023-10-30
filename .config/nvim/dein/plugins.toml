@@ -6,20 +6,41 @@ repo = 'Shougo/dein.vim'
 [[plugins]]
 repo = 'famiu/bufdelete.nvim'
 
-# Gitでいろいろできるが
-# ステータスバーにgit出したいため
-# あとよく使う
+
+#############################
+# Git 
+#############################
+# Gitメイン
+# ステータスバーにブランチ名出すににも使っている
 # cf. https://qiita.com/tashua314/items/35521f9bada5fe00cca7
+# キーはこちらを参考にした
+# cf. https://www.instapaper.com/read/1642598838
 [[plugins]]
 repo = 'tpope/vim-fugitive'
 hook_add = '''
 set diffopt+=vertical
+"nnoremap <Leader>gs :Git<CR>
+nnoremap <Leader>gs :tab sp<CR>:Git<CR>:only<CR>
+nnoremap <Leader>ga :Gwrite<CR>
+nnoremap <Leader>gc :Git commit<CR>
+nnoremap <leader>gp :Git push<CR>
+nnoremap <leader>gb :Git blame<CR>
+nnoremap <leader>gl :Git log<CR>
+nnoremap <leader>gd :Gvdiffsplit<CR>
+"nnoremap <leader>gf :Git fetch<CR>
+"nnoremap <leader>gm :Git merge<CR>
+" 当時のファイル遡れるので使いやすい
+nnoremap <leader>gi :tab sp<CR>:0Gclog<CR>
 '''
 
-# コミットブラウザ fugitiveのplugin
-# GVからログを辿ってdiffまで見られるので完璧
+# コミットブラウザ
+# GVからログを辿ってdiffまで見る
+# tabを開くのでqで消すべき
 [[plugins]]
 repo = 'junegunn/gv.vim'
+hook_add = '''
+nnoremap <leader>gv :GV<CR>
+'''
 
 
 # gitのdiffを表示したり、hunkを使いやすくする
@@ -31,10 +52,10 @@ let g:gitgutter_map_keys = 0
 "" git操作
 nnoremap g[ <Plug>(GitGutterPrevHunk)
 nnoremap g] <Plug>(GitGutterNextHunk)
-nnoremap <Leader>gh :GitGutterLineHighlightsToggle<CR>
-nnoremap <Leader>gs <Plug>(GitGutterStageHunk)
-nnoremap <Leader>gu <Plug>(GitGutterUndoHunk)
-nnoremap <Leader>gp <Plug>(GitGutterPreviewHunk)
+nnoremap <Leader>ghh :GitGutterLineHighlightsToggle<CR>
+nnoremap <Leader>ghs <Plug>(GitGutterStageHunk)
+nnoremap <Leader>ghu <Plug>(GitGutterUndoHunk)
+nnoremap <Leader>ghp <Plug>(GitGutterPreviewHunk)
 
 " 色変更
 highlight GitGutterAdd ctermfg=green
