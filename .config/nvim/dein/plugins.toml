@@ -13,6 +13,7 @@ repo = 'famiu/bufdelete.nvim'
 [[plugins]]
 repo = 'tpope/vim-fugitive'
 hook_add = '''
+set diffopt+=vertical
 '''
 
 
