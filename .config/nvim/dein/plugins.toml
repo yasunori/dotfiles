@@ -23,7 +23,7 @@ set diffopt+=vertical
 nnoremap <Leader>gs :tab sp<CR>:Git<CR>:only<CR>
 nnoremap <Leader>ga :Gwrite<CR>
 nnoremap <Leader>gc :Git commit<CR>
-nnoremap <leader>gp :Git push<CR>
+"nnoremap <leader>gp :Git push<CR>
 nnoremap <leader>gb :Git blame<CR>
 nnoremap <leader>gl :Git log<CR>
 nnoremap <leader>gd :Gvdiffsplit<CR>
