@@ -360,10 +360,11 @@ hook_add = '''
 repo = 'ap/vim-buftabline'
 hook_add = '''
 let g:buftabline_numbers = 2
-highlight BufTabLineCurrent guifg=#d4d4d9 ctermfg=188 guibg=#89898c ctermbg=240 gui=NONE cterm=NONE
-highlight BufTabLineActive guifg=#afafb2 ctermfg=145 guibg=#3e3e40 ctermbg=236 gui=NONE cterm=NONE
-highlight BufTabLineHidden guifg=#89898c ctermfg=245 guibg=#3e3e40 ctermbg=236 gui=NONE cterm=NONE
-highlight BufTabLineFill guifg=NONE ctermfg=NONE guibg=#252527 ctermbg=235 gui=NONE cterm=NONE
+" デフォルトの黄色のほうが見やすかったのでコメントアウト
+"highlight BufTabLineCurrent guifg=#d4d4d9 ctermfg=188 guibg=#89898c ctermbg=240 gui=NONE cterm=NONE
+"highlight BufTabLineActive guifg=#afafb2 ctermfg=145 guibg=#3e3e40 ctermbg=236 gui=NONE cterm=NONE
+"highlight BufTabLineHidden guifg=#89898c ctermfg=245 guibg=#3e3e40 ctermbg=236 gui=NONE cterm=NONE
+"highlight BufTabLineFill guifg=NONE ctermfg=NONE guibg=#252527 ctermbg=235 gui=NONE cterm=NONE
 
 nnoremap <Leader>l :bnext<CR>
 nnoremap <Leader>h :bprev<CR>
