@@ -367,6 +367,8 @@ highlight BufTabLineFill guifg=NONE ctermfg=NONE guibg=#252527 ctermbg=235 gui=N
 
 nnoremap <Leader>l :bnext<CR>
 nnoremap <Leader>h :bprev<CR>
+nnoremap <C-l> :bnext<CR>
+nnoremap <C-h> :bprev<CR>
 nnoremap <Leader>x :bd<CR>
 nmap <Leader>1 <Plug>BufTabLine.Go(1)
 nmap <Leader>2 <Plug>BufTabLine.Go(2)
