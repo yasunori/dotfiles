@@ -16,6 +16,11 @@ hook_add = '''
 set diffopt+=vertical
 '''
 
+# コミットブラウザ fugitiveのplugin
+# GVからログを辿ってdiffまで見られるので完璧
+[[plugins]]
+repo = 'junegunn/gv.vim'
+
 
 # gitのdiffを表示したり、hunkを使いやすくする
 [[plugins]]
