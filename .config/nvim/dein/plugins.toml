@@ -23,7 +23,7 @@ set diffopt+=vertical
 nnoremap <Leader>gs :tab sp<CR>:Git<CR>:only<CR>
 nnoremap <Leader>ga :Gwrite<CR>
 nnoremap <Leader>gc :Git commit<CR>
-"nnoremap <leader>gp :Git push<CR>
+nnoremap <leader>gp :call GitPushCurrentBranch()<CR>
 nnoremap <leader>gb :Git blame<CR>
 nnoremap <leader>gl :Git log<CR>
 nnoremap <leader>gd :Gvdiffsplit<CR>
@@ -31,6 +31,19 @@ nnoremap <leader>gd :Gvdiffsplit<CR>
 "nnoremap <leader>gm :Git merge<CR>
 " 当時のファイル遡れるので使いやすい
 nnoremap <leader>gh :tab sp<CR>:0Gclog<CR>
+
+" 同名のブランチへpush
+" cf. https://izumisy.work/entry/2021/08/23/160738
+function! GitPushCurrentBranch()
+  let branch = trim(system('git branch --show-current'))
+  let confirmation = input("Push " . branch . " to origin? (Y/N): ")
+  if tolower(confirmation) == 'y'
+    echo "Pushing..."
+    execute ":Git push origin " . branch
+  else
+    echo "Cancelled."
+  endif
+endfunction
 '''
 
 # コミットブラウザ
@@ -40,6 +53,7 @@ nnoremap <leader>gh :tab sp<CR>:0Gclog<CR>
 repo = 'junegunn/gv.vim'
 hook_add = '''
 nnoremap <leader>gv :GV<CR>
+nnoremap <leader>gi :GV!<CR>
 '''
 
 
