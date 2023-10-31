@@ -56,6 +56,9 @@ nnoremap <leader>gv :GV<CR>
 nnoremap <leader>gi :GV!<CR>
 '''
 
+[[plugins]]
+repo = 'rbong/vim-flog'
+
 
 # gitのdiffを表示したり、hunkを使いやすくする
 [[plugins]]
