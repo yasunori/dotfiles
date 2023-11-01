@@ -52,12 +52,17 @@ endfunction
 [[plugins]]
 repo = 'junegunn/gv.vim'
 hook_add = '''
-nnoremap <leader>gv :GV<CR>
-nnoremap <leader>gi :GV!<CR>
+"nnoremap <leader>gv :GV<CR>
+"nnoremap <leader>gi :GV!<CR>
 '''
 
+# GVよりもよさそう
 [[plugins]]
 repo = 'rbong/vim-flog'
+hook_add = '''
+nnoremap <leader>gv :Flogsplit<CR>
+nnoremap <leader>gi :Flogsplit -path=%<CR>
+'''
 
 
 # gitのdiffを表示したり、hunkを使いやすくする
