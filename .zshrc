@@ -47,7 +47,7 @@ fi
 # sheldon読み込むかどうかの判定
 export ZPLUG_LOAD_FLG="1"
 if [ -n "$VIMRUNTIME" ]; then  # vimからのtermのとき速度向上のためやらない
-    ZPLUG_LOAD_FLG="0"
+    ZPLUG_LOAD_FLG="1"  # 様子見だがsheldonにしたら速度向上した
 fi
 
 if [ "$ZPLUG_LOAD_FLG" = "1" ]; then
