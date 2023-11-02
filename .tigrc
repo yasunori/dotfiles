@@ -11,26 +11,57 @@ set log-view    = line-number:yes,interval=1 text
 set blob-view   = line-number:yes,interval=1 text
 set diff-view   = line-number:yes,interval=1 text:yes,commit-title-overflow=no
 
+# # 画面を垂直方向に分割する
+set vertical-split = yes
+#
+# 横分割に強制する
+set vertical-split = no
+#
+# # デフォルト値
+# set vertical-split = auto
 
-# # Visualization
-set id-width = 8
-set blame-options = -C -C -C
-set horizontal-scroll = 33%
-set show-notes = yes
-set show-changes = yes
+# utf-8 文字で画面描画する (~でトグル)
+set line-graphics = utf-8
+
+# タブサイズ
+set tab-size = 4
+
+# # 空白無視
+# set ignore-space = all
+
+# 空白無視 (status-view では表示するが diff-view では無視する) (W でトグル)
+set ignore-space = at-eol
+
+# 検索時に大文字小文字を無視する (default: false)
+set ignore-case = true
+
+# 水平分割したウィンドウの下画面サイズを % で指定（行数指定も可）
 set split-view-height = 80%
-set status-show-untracked-dirs = yes
-set tab-size = 2
-set diff-context = 3
 
-set ignore-space = some
-set commit-order = topo
-set ignore-case = yes
-set wrap-lines = yes
-set focus-child = yes
+# マージ diff を表示する
+set diff-options = -m --first-parent
+
+# マウスを有効にする
+set mouse = false
+
+# '+行数' の形で Editor に行番号を引数として渡すか
+set editor-line-number = yes
+
+# リフレッシュするタイミング
+set refresh-mode = auto
+#set refresh-mode = after-command
+#set refresh-mode = periodic
+#set refresh-interval = 1
+
+# 差分表示に diff-highlight を使う (要 tig 2.2.1 以降. diff-highlight が $PATH にあること)
+#set diff-highlight = true
+# カラー設定
+# diff-view で境界が見やすくなるように変更
+#color  diff-header       default magenta
+#color  diff-chunk        black   white
 
 
-# Bind Settings
+# 動作
 bind generic <C-f> move-page-down
 bind generic <C-b> move-page-up
 bind generic g move-first-line
@@ -38,31 +69,99 @@ bind main    G  none
 bind main    G  move-last-line
 bind generic G  move-last-line
 
-# revertを定義
-bind main v !?git revert %(commit)
-bind diff v !?git revert %(commit)
-bind main V !?git revert %(prompt) %(commit)
-bind diff V !?git revert %(prompt) %(commit)
+# revert(取り消しコミットの作成)
+# https://qiita.com/sfus/items/063797a1dd8fdc7d032f#revert
+bind main v ?git revert %(commit)
+bind diff v ?git revert %(commit)
+bind main V ?git revert %(prompt) %(commit)
+bind diff V ?git revert %(prompt) %(commit)
 
-# rebase
-bind main R !git rebase -i %(commit)
-bind diff R !git rebase -i %(commit)
+# rebase i(まとめ・修正用)
+bind main <Esc>i ?git rebase -i %(commit)
+bind diff <Esc>i ?git rebase -i %(commit)
+# rebase  i(追随用)
+bind main    I      ?git rebase -i %(branch)
+bind diff    I      ?git rebase -i %(branch)
+bind refs    I      ?git rebase -i %(branch)
 
-bind generic F none
-bind generic F !git fe # git fetch
+# rebase(追随にはこっちかな)
+bind main    R      ?git rebase %(branch)
+bind diff    R      ?git rebase %(branch)
+bind refs    R      ?git rebase %(branch)
+bind main    <Esc>r ?git rebase %(commit)
+bind diff    <Esc>r ?git rebase %(commit)
 
-bind branch C !git co -b %(prompt) %(branch)
-bind branch P !git push origin %(branch)
-bind branch L !git pull origin %(branch)
-bind branch H !git-browse-remote %(branch)
+# M で merge(使うかな?)
+bind main    M      ?git merge %(branch)
+bind diff    M      ?git merge %(branch)
+bind refs    M      ?git merge %(branch)
+bind main    <Esc>m ?git merge %(commit)
+bind diff    <Esc>m ?git merge %(commit)
 
-bind generic M none
-bind branch M none
-bind branch M !git merge %(branch)
 
+# amend(直前のコミットの上書き)
+# 直前のコミットに追加しながらコミットしたり
+# コメント修正だけしたり
+bind generic +      !git commit --amend --allow-empty
+
+# reset --hard(取り消し)
+# H で reset --hard
+bind main    H      ?git reset --hard %(commit)
+bind diff    H      ?git reset --hard %(commit)
+# 今いるブランチを指定ブランチに合わせる
+bind refs    H      ?git reset --hard %(branch)
+# status view ではadd作業をなかったことにするHEAD
+bind status  H      ?git reset --hard HEAD
+
+# ^ で reset --soft
+# 作業途中のものを仮commitしたあと^HEADを戻す意図
+# cf. https://qiita.com/sfus/items/063797a1dd8fdc7d032f#reset---soft
+bind generic ^      ?git reset --soft HEAD^
+
+# fetch
+# Fでいつでもfetch (default: :toggle file-name / :toggle commit-title-refs)
+bind generic F      ?git fetch %(remote)
+bind main    F      ?git fetch %(remote)
+
+# push / pull
+#bind refs C ?git co -b %(prompt) %(branch)
+bind generic P ?git push -u %(remote) %(repo:head)
+bind generic U ?git pull origin %(branch)
+
+# checkout
+# = で checkout
+bind main    =      ?git checkout %(branch)
+bind refs    =      ?git checkout %(branch)
+bind main    <Esc>= ?git checkout %(commit)
+
+# - で直前のブランチに戻る (checkout -)
+bind generic -      ?git checkout -
+
+# T で tag
+bind main    T ?git tag "%(prompt Enter tag name: )" %(commit)
+bind refs    T ?git tag "%(prompt Enter tag name: )" %(branch)
+
+# B でブランチを作成してそのブランチに移動 (checkout -b)
+bind main    B      ?git checkout -b "%(prompt Enter branch name: )" %(branch)
+bind refs    B      ?git checkout -b "%(prompt Enter branch name: )" %(branch)
+bind main    <Esc>b ?git checkout -b "%(prompt Enter branch name: )" %(commit)
+
+# stash
+# S で stash save
+bind generic S      ?git stash save "%(prompt Enter stash comment: )"
+
+# Y で stash pop
+bind diff    Y      ?git stash pop %(stash)
+bind stash   Y      ?git stash pop %(stash)
+
+# Alt-y で stash apply
+bind diff    <Esc>y ?git stash apply %(stash)
+bind stash   <Esc>y ?git stash apply %(stash)
+
+# commit
 bind status C !git commit -v
 
-# `-` でステージ・アンステージをスイッチ
+# `-` でステージ・アンステージをスイッチ(fugitiv)
 bind status u none
 bind status - status-update
 bind stage u none
