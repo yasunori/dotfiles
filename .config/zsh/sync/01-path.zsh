@@ -102,6 +102,7 @@ case ${OSTYPE} in
         #自分のvim使う
         alias vi='env LANG=ja_JP.UTF-8 $HOME/.linuxbrew/bin/nvim "$@"'
         alias vim='env LANG=ja_JP.UTF-8 $HOME/.linuxbrew/bin/nvim "$@"'
+        export GIT_EDITOR=$HOME/.linuxbrew/bin/nvim
 
         # EDITOR
         # nvim内のterminalでnvimを開くとき、nvr を使うと入れ子にならずにもとのnvimで開き直してくれる
@@ -110,12 +111,11 @@ case ${OSTYPE} in
         if [ -n "$VIMRUNTIME" ]; then
             export EDITOR=nvr
             export VISUAL=nvr
-            export GIT_EDITOR=nvr
+            # GIT_EDITORを変えない理由は、git commitの時にnvimをsaveしてもメッセージが入力できない。入れ子を許容する
             export NVIM_LISTEN_ADDRESS=$NVIM  # NVIMに変わったがnvrがNVIM_LISTEN_ADDRESSを見ている？
         else
             export EDITOR=$HOME/.linuxbrew/bin/nvim
             export VISUAL=$HOME/.linuxbrew/bin/nvim
-            export GIT_EDITOR=$HOME/.linuxbrew/bin/nvim
         fi
 
         # linuxbrew
