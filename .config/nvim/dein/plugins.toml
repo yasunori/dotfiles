@@ -60,29 +60,14 @@ hook_add = '''
 [[plugins]]
 repo = 'rbong/vim-flog'
 hook_add = '''
-nnoremap <leader>gv :Flogsplit<CR>
-nnoremap <leader>gi :Flogsplit -path=%<CR>
-'''
+nnoremap <leader>gv :Flog<CR>
+nnoremap <leader>gi :Flog -path=%<CR>
 
-# tigにまかせるほうがいいことも多い
-# cf. https://iberianpig.github.io/posts/2019-04-30_how-to-use-tig-explorer.vim/
-[[plugins]]
-repo = 'iberianpig/tig-explorer.vim'
-hook_add = '''
-" tigを開く
-nnoremap <Leader>tv :TigOpenProjectRootDir<CR>
-" 現在のファイルの履歴を見る
-nnoremap <Leader>ti :TigOpenCurrentFile<CR>
-" パターンでtig grepする
-nnoremap <Leader>tg :TigGrep<CR>
-" tig grepした内容を再呼び出しする
-nnoremap <Leader>tr :TigGrepResume<CR>
-" 選択中のキーワードでtig grepする
-"vnoremap <Leader>tg y:TigGrep<Space><C-R>"<CR>
-" カーソル下のキーワードでtig grepする
-"nnoremap <Leader>cg :<C-u>:TigGrep<Space><C-R><C-W><CR>
-" 現在のカーソル位置でtig blameする
-nnoremap <Leader>tb :TigBlame<CR>
+" tigも開こう
+nnoremap <leader>tv :terminal tig<CR>
+nnoremap <leader>ti :terminal tig %<CR>
+nnoremap <leader>tb :terminal tig blame %<CR>
+nnoremap <leader>ts :terminal tig status<CR>
 '''
 
 
