@@ -19,53 +19,43 @@ repo = 'famiu/bufdelete.nvim'
 repo = 'tpope/vim-fugitive'
 hook_add = '''
 set diffopt+=vertical
-"nnoremap <Leader>gs :Git<CR>
+
+" ビュー系
 nnoremap <Leader>gs :tab sp<CR>:Git<CR>:only<CR>
-nnoremap <Leader>ga :Gwrite<CR>
-nnoremap <Leader>gc :Git commit<CR>
-nnoremap <leader>gp :call GitPushCurrentBranch()<CR>
 nnoremap <leader>gb :Git blame<CR>
 nnoremap <leader>gl :Git log<CR>
 nnoremap <leader>gd :Gvdiffsplit<CR>
-"nnoremap <leader>gf :Git fetch<CR>
-"nnoremap <leader>gm :Git merge<CR>
-" 当時のファイル遡れるので使いやすい
+" history 当時のファイル遡れるので使いやすい
 nnoremap <leader>gh :tab sp<CR>:0Gclog<CR>
+
+" 操作系(add, commit, push)
+nnoremap <Leader>ga :Gwrite<CR>
+" status画面からccでやるのであまり使わないが
+nnoremap <Leader>gc :Git commit<CR>
+nnoremap <leader>gp :call GitPushCurrentBranch()<CR>
 
 " 同名のブランチへpush
 " cf. https://izumisy.work/entry/2021/08/23/160738
 function! GitPushCurrentBranch()
   let branch = trim(system('git branch --show-current'))
-  let confirmation = input("Push " . branch . " to origin? (Y/N): ")
-  if tolower(confirmation) == 'y'
-    echo "Pushing..."
-    execute ":Git push origin " . branch
-  else
-    echo "Cancelled."
-  endif
+  let exec = ":Git push origin " . branch
+  call ConfirmActionAndExec(exec)
 endfunction
+
 '''
 
 # コミットブラウザ
-# GVからログを辿ってdiffまで見る
-# tabを開くのでqで消すべき
-[[plugins]]
-repo = 'junegunn/gv.vim'
-hook_add = '''
-"nnoremap <leader>gv :GV<CR>
-"nnoremap <leader>gi :GV!<CR>
-'''
-
-# GVよりもよさそう
 [[plugins]]
 repo = 'rbong/vim-flog'
 hook_add = '''
-nnoremap <leader>gv :Flog<CR>
-nnoremap <leader>gi :Flog -path=%<CR>
+" main画面(tigのmainの意図)
+nnoremap <leader>gm :Flog<CR>
+" 特定のファイルで(only)
+nnoremap <leader>go :Flog -path=%<CR>
 
-" tigも開こう
-nnoremap <leader>tv :terminal tig<CR>
-nnoremap <leader>ti :terminal tig %<CR>
+" 同じ操作感でtigも開く
+nnoremap <leader>tm :terminal tig<CR>
+nnoremap <leader>to :terminal tig %<CR>
 nnoremap <leader>tb :terminal tig blame %<CR>
 nnoremap <leader>ts :terminal tig status<CR>
 '''
