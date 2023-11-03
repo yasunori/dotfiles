@@ -207,3 +207,21 @@ tnoremap <C-W>k <cmd>wincmd k<cr>
 tnoremap <C-W>h <cmd>wincmd h<cr>
 tnoremap <C-W>l <cmd>wincmd l<cr>
 
+" 確認処理を行う汎用関数
+function! ConfirmActionAndCall(actionFunc)
+  let user_input = input("call " . a:actionFunc . " (Y/N): ")
+  if toupper(user_input) == 'Y'
+    call a:actionFunc()
+  else
+    echo "Cancelled."
+  endif
+endfunction
+
+function! ConfirmActionAndExec(commandStr)
+  let user_input = input(a:commandStr . "? (Y/N): ")
+  if toupper(user_input) == 'Y'
+    execute a:commandStr
+  else
+    echo "Cancelled."
+  endif
+endfunction
