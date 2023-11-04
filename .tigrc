@@ -127,6 +127,11 @@ bind main    F      ?git fetch %(remote)
 #bind refs C ?git co -b %(prompt) %(branch)
 bind generic P ?git push -u %(remote) %(repo:head)
 bind generic U ?git pull origin %(branch)
+# Alt-u で該当ブランチを更新(そのあとrebaseすると追随になる)
+# --ff-onlyなのでmerge commit発生しそうなときは何もしない
+bind main    <Esc>u ?sh -c "git checkout %(branch) && git pull %(remote) --ff-only && git checkout -"
+bind diff    <Esc>u ?sh -c "git checkout %(branch) && git pull %(remote) --ff-only && git checkout -"
+bind refs    <Esc>u ?sh -c "git checkout %(branch) && git pull %(remote) --ff-only && git checkout -"
 
 # checkout
 # = で checkout
