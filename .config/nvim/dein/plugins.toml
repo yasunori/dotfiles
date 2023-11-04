@@ -31,8 +31,9 @@ nnoremap <leader>gh :tab sp<CR>:0Gclog<CR>
 " 操作系(add, commit, push)
 nnoremap <Leader>ga :Gwrite<CR>
 " status画面からccでやるのであまり使わないが
-nnoremap <Leader>gc :Git commit<CR>
-nnoremap <leader>gp :call GitPushCurrentBranch()<CR>
+nnoremap <Leader>gC :Git commit -v<CR>
+nnoremap <leader>gP :call GitPushCurrentBranch()<CR>
+nnoremap <leader>gB :call GitMakeBranchAndMove()<CR>
 
 " 同名のブランチへpush
 " cf. https://izumisy.work/entry/2021/08/23/160738
@@ -42,6 +43,13 @@ function! GitPushCurrentBranch()
   call ConfirmActionAndExec(exec)
 endfunction
 
+" ブランチ作成
+function! GitMakeBranchAndMove()
+  let branch = input('branch name: ')
+  let exec = ":Git checkout -b  " . branch
+  "call ConfirmActionAndExec(exec)
+  execute exec
+endfunction
 '''
 
 # コミットブラウザ
@@ -49,12 +57,12 @@ endfunction
 repo = 'rbong/vim-flog'
 hook_add = '''
 " main画面(tigのmainの意図)
-nnoremap <leader>gm :Flog<CR>
+nnoremap <leader>gv :Flog<CR>
 " 特定のファイルで(only)
 nnoremap <leader>go :Flog -path=%<CR>
 
 " 同じ操作感でtigも開く
-nnoremap <leader>tm :terminal tig<CR>
+nnoremap <leader>tv :terminal tig<CR>
 nnoremap <leader>to :terminal tig %<CR>
 nnoremap <leader>tb :terminal tig blame %<CR>
 nnoremap <leader>ts :terminal tig status<CR>
