@@ -60,7 +60,7 @@ set directory=/tmp
 " set paste
 
 " 記号化ける
-" set ambiwidth=double
+set ambiwidth=double
 
 "migemoつかう。要migemo.
 "set migemo
