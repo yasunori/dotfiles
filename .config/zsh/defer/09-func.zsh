@@ -60,6 +60,13 @@ zle -N find_cd
 bindkey '^X' find_cd
 
 
+fvi() {
+  local file
+  file=$(find . | fzf)
+  vi "$file"
+}
+
+
 ###################
 # git関連
 # cf. https://dev.classmethod.jp/articles/fzf-original-app-for-git-add/

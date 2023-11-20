@@ -59,8 +59,10 @@ set directory=/tmp
 " 補完とかはいって大変
 " set paste
 
-" 記号化ける
-set ambiwidth=double
+" 記号がズレる対策
+"set ambiwidth=double
+"fzfの画面がずれるほうが致命的なのでいったんsingleにする
+set ambiwidth=single
 
 "migemoつかう。要migemo.
 "set migemo

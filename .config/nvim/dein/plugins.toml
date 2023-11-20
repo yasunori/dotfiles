@@ -164,131 +164,371 @@ hook_add = '''
    let g:copilot_node_command = '~/.nodebrew/node/v16.10.0/bin/node'
 '''
 
-[[plugins]] # denite
-repo = 'Shougo/denite.nvim'
+[[plugins]]
+repo = 'junegunn/fzf'
+hook_post_update = './install --all'
+merged = 0
+
+
+[[plugins]]
+repo = 'junegunn/fzf.vim'
+on_cmd = [
+    'Files',
+    'ProjectFiles',
+    'Buffers',
+    'BLines',
+    'History',
+    'Tags',
+    'BTags',
+    'GFiles',
+    'Ag',
+]
 hook_add = '''
-    "ESCキーでdeniteを終了（できなくなった？）
-    "call denite#custom#map('insert', '<esc>', '<denite:enter_mode:normal>', 'noremap')
-    "call denite#custom#map('normal', '<esc>', '<denite:quit>', 'noremap')
+"let $FZF_DEFAULT_OPTS="--layout=reverse"
+let $FZF_DEFAULT_COMMAND="rg --files --hidden --glob !.git/** --color always "
+let g:fzf_layout = {'up':'~90%', 'window': { 'width': 0.9, 'height': 0.9,'yoffset':0.5,'xoffset': 0.5 } }
+"let g:fzf_layout = { 'down': '~40%' }
+let g:fzf_action = {
+  \ 'ctrl-t': 'tab split',
+  \ 'ctrl-s': 'split',
+  \ 'ctrl-v': 'vsplit' }
 
-    "rgあれば使う
-    if executable('rg')
-      call denite#custom#var('file_rec', 'command',
-        \ ['rg', '--files', '--glob', '!.git', '--color', 'always'])
-      call denite#custom#var('grep', 'command', ['rg'])
-      call denite#custom#var('grep', 'recursive_opts', [])
-      call denite#custom#var('grep', 'final_opts', [])
-      call denite#custom#var('grep', 'separator', ['--'])
-      call denite#custom#var('grep', 'default_opts', ['--vimgrep', '--no-heading'])
-    endif
+" Project全体
+command! ProjectFiles execute 'GFiles' systemlist('git rev-parse --show-toplevel')[0]
+"command! ProjectFiles execute 'GFiles' s:get_git_root()
 
-    "file/recの除外ファイル設定
-    call denite#custom#source('file/rec', 'matchers', ['matcher_fuzzy','matcher_ignore_globs'])
-    call denite#custom#filter('matcher_ignore_globs', 'ignore_globs',
-      \ [
-      \ '.git/', 'build/', '__pycache__/', 'node_modules/', '.mypy_cache/', '.venv/', 'venvs/',
-      \ 'images/', '*.o', '*.make',
-      \ '*.min.*',
-      \ 'img/', 'fonts/', 'tmp/'])
+" Projectのgrep
+command! -bang -nargs=* ProjectGrep
+  \ call fzf#vim#grep(
+  \   'git grep --line-number -- '.fzf#shellescape(<q-args>),
+  \   fzf#vim#with_preview({'dir': systemlist('git rev-parse --show-toplevel')[0]}), <bang>0)
 
-    "neomruをプロジェクト内に絞る設定
-    call denite#custom#source(
-      \ 'file_mru', 'matchers',
-      \ ['matcher_project_files', 'matcher_fuzzy'])
+" Projectのhistory
+command! -bang ProjectHistory call fzf#run(fzf#wrap(s:preview(<bang>0, {
+  \ 'source': s:file_history_from_directory(s:get_git_root()),
+  \ 'options': [
+  \   '--prompt', 'ProjectHistory> ',
+  \   '--multi',
+  \ ]}), <bang>0))
 
-    "バッファ,最近使ったファイル,プロジェクト内のファイル全部のせ
-    noremap <C-B> :DeniteProjectDir -start-filter buffer file_mru file/rec<CR>
-    inoremap <C-B> <ESC>:DeniteProjectDir -start-filter buffer file_mru file/rec<CR>
+" カレント以下のhistory
+command! -bang CwdHistory call fzf#run(fzf#wrap(s:preview(<bang>0, {
+  \ 'source': s:file_history_from_directory(getcwd()),
+  \ 'options': [
+  \   '--prompt', 'CwdHistory> ',
+  \   '--multi',
+  \ ]}), <bang>0))
 
-    "バッファ,プロジェクト内のファイル
-    noremap <C-P> :DeniteProjectDir -start-filter buffer file/rec<CR>
+" Projectのよく使うもの(バッファ,最近使ったファイル,プロジェクト内のファイル)
+command! -bang ProjectUsefulFiles call fzf#run(fzf#wrap(s:preview(<bang>0, {
+  \ 'source': s:useful_files(s:get_git_root()),
+  \ 'options': [
+  \   '--prompt', 'ProjectUsefulFiles> ',
+  \   '--multi',
+  \ ]}), <bang>0))
 
-    "バッファ一覧
-    noremap <Leader>ub :Denite buffer<CR>
+function! s:useful_files(directory)
+  let buffer = s:get_file_buffer_list()
+  let history = s:file_history_from_directory(a:directory)
+  let files = split(system('git ls-files'), "\n")
+  let l = fzf#vim#_uniq(buffer + history + files)
+  return fzf#vim#_uniq(buffer + history + files)
+endfunction
 
-    "最近使ったファイルの一覧
-    noremap <Leader>um :Denite file_mru<CR>
+function! s:file_history_from_directory(directory)
+  return fzf#vim#_uniq(filter(fzf#vim#_recent_files(), "s:file_is_in_directory(fnamemodify(v:val, ':p'), a:directory)"))
+endfunction
 
-    "カレントディレクトリ
-    noremap <Leader>uf :DeniteBufferDir file/rec<CR>
+function! s:file_is_in_directory(file, directory)
+  return filereadable(a:file) && match(a:file, a:directory . '/') == 0
+endfunction
 
-    " Denige grep
-    nnoremap <silent><Leader>ug :Denite grep -buffer-name=search-buffer-denite<CR>
-    " Denite grep検索結果を再表示する
-    nnoremap <silent><Leader>ugr :<C-u>Denite -resume -buffer-name=search-buffer-denite<CR>
-    " resumeした検索結果の次の行の結果へ飛ぶ
-    "nnoremap <silent><Leader>ugn :<C-u>Denite -resume -buffer-name=search-buffer-denite -select=+1 -immediately<CR>
-    " resumeした検索結果の前の行の結果へ飛ぶ
-    "nnoremap <silent><Leader>ugp :<C-u>Denite -resume -buffer-name=search-buffer-denite -select=-1 -immediately<CR>
+function! s:preview(bang, ...)
+  let preview_window = get(g:, 'fzf_preview_window', a:bang && &columns >= 80 || &columns >= 120 ? 'right': '')
+  if len(preview_window)
+    return call('fzf#vim#with_preview', add(copy(a:000), preview_window))
+  endif
+  return {}
+endfunction
 
-    " Notes
-    " ノートの一覧
-    command! -nargs=? Noteslist call Noteslist(<f-args>)
-    function! Noteslist(...)
-      if a:0 >= 1
-        if a:1 == 'memo'
-          :Denite -start-filter -path=~/notes/memo file/rec
-        endif
-        if a:1 == 'clients'
-          :Denite -start-filter -path=~/notes/clients file/rec
-        endif
+function! s:get_git_root()
+  let root = split(system('git rev-parse --show-toplevel'), '\n')[0]
+  return v:shell_error ? '' : root
+endfunction
+
+function! s:get_file_buffer_list()
+  return filter(map(range(1, bufnr('$')), 'bufname(v:val)'), 'v:val != ""')
+endfunction
+
+" ノートの一覧
+command! Nlist execute 'Files ~/notes'
+
+ " ノートの検索
+command! -bang -nargs=* Ngrep
+  \ call fzf#vim#grep(
+  \   'git grep --line-number -- '.fzf#shellescape(''),
+  \   fzf#vim#with_preview({'dir': '~/notes/'}), <bang>0)
+
+" ノート作成
+command! Nadd :term notesadd
+
+" メモ作成
+command! -nargs=? Nmemo call Nmemo(<f-args>)
+function! Nmemo(...)
+  if a:0 >= 1
+     exe("term notesmemo " . a:1)
+  else
+    :term notesmemo
+  endif
+endfunction
+
+" 今日の日記作成
+command! Ndiary :term notesdiary
+
+" TODO検索
+command! Ntodo :Denite grep:::'\[\s\]'
+
+
+
+"command! -nargs=? Ngrep call Ngrep(<f-args>)
+" function! Ngrep(...)
+"   if a:0 >= 1
+"     if a:1 == 'memo'
+"       call fzf#vim#grep(
+"       \ 'git grep --line-number -- '.fzf#shellescape('memo'),
+"       \ fzf#vim#with_preview({'dir': '~/notes/'}), 0)
+"     endif
+"     if a:1 == 'clients'
+"       call fzf#vim#grep(
+"       \ 'git grep --line-number -- '.fzf#shellescape(''),
+"       \ fzf#vim#with_preview({'dir': '~/notes/clients/'}), 0)
+"     endif
+"   else
+"       call fzf#vim#grep(
+"       \ 'git grep --line-number -- '.fzf#shellescape(''),
+"       \ fzf#vim#with_preview({'dir': '~/notes/'}), 0)
+"   endif
+" endfunction
+
+
+"""""""" ここから実験 """"""""
+" cf. https://gist.github.com/danmikita/d855174385b3059cd6bc399ad799555e
+
+let s:files_status = {}
+
+function! s:cacheGitStatus()
+  let l:gitcmd = 'git -c color.status=false -C ' . $PWD . ' status -s'
+  let l:statusesStr = system(l:gitcmd)
+  let l:statusesSplit = split(l:statusesStr, '\n')
+  for l:statusLine in l:statusesSplit
+    let l:fileStatus = split(l:statusLine, ' ')[0]
+    let l:fileName = split(l:statusLine, ' ')[1]
+    let s:files_status[l:fileName] = l:fileStatus
+  endfor
+endfunction
+
+function! s:prepend_indicators(candidates)
+  return s:prepend_git_status(a:candidates)
+endfunction
+
+  function! s:prepend_git_status(candidates)
+    let l:result = []
+    for l:candidate in a:candidates
+      let l:status = ''
+      "let l:icon = split(l:candidate, ' ')[0]
+      let l:filePathWithIcon = split(l:candidate, ' ')[0]
+
+      let l:pos = strridx(l:filePathWithIcon, ' ')
+      let l:file_path = l:filePathWithIcon[pos+1:-1]
+      if has_key(s:files_status, l:file_path)
+        let l:status = s:files_status[l:file_path]
+        call add(l:result, printf('%s %s', l:status, l:file_path))
       else
-        :Denite -start-filter -path=~/notes/ file/rec
+        " printf statement contains a load-bearing unicode space
+        " the file path is extracted from the list item using {3..-1},
+        " this breaks if there is a different number of spaces, which
+        " means if we add a space in the following printf it breaks.
+        " using a unicode space preserves the spacing in the fzf list
+        " without breaking the {3..-1} index
+        call add(l:result, printf('%s %s', ' ', l:file_path))
       endif
-    endfunction
+    endfor
 
-    " ノートの検索
-    command! -nargs=? Notesgrep call Notesgrep(<f-args>)
-    function! Notesgrep(...)
-      if a:0 >= 1
-        if a:1 == 'memo'
-          :Denite grep -path=~/notes/memo -buffer-name=search-buffer-denite
-        endif
-        if a:1 == 'clients'
-          :Denite grep -path=~/notes/clients -buffer-name=search-buffer-denite
-        endif
-      else
-        " :Denite grep -path=~/notes/ -buffer-name=search-buffer-denite
-        :Denite grep -path=~/notes/
-      endif
-    endfunction
+    return l:result
+  endfunction
 
-    " ノート作成
-    command! Notesadd :term notesadd
+  function! s:edit_file(lines)
+    if len(a:lines) < 2 | return | endif
 
-    " メモ作成
-    command! -nargs=? Notesmemo call Notesmemo(<f-args>)
-    function! Notesmemo(...)
-      if a:0 >= 1
-         exe("term notesmemo " . a:1)
-      else
-        :term notesmemo
-      endif
-    endfunction
+    let l:cmd = get({'ctrl-x': 'split',
+                 \ 'ctrl-v': 'vertical split',
+                 \ 'ctrl-t': 'tabe'}, a:lines[0], 'e')
 
-    " 今日の日記作成
-    command! Notesdiary :term notesdiary
+    for l:item in a:lines[1:]
+      let l:pos = strridx(l:item, ' ')
+      let l:file_path = l:item[pos+1:-1]
+      execute 'silent '. l:cmd . ' ' . l:file_path
+    endfor
+  endfunction
+'''
 
-    " TODO検索
-    command! Notestodo :Denite grep:::'\[\s\]'
+[[plugins]]
+repo = 'yuki-yano/fzf-preview.vim'
+rev = 'release/rpc'
+on_cmd = [
+    'FzfPreviewFromResourcesRpc',
+    'FzfPreviewGitStatusRpc',
+    'FzfPreviewBuffersRpc',
+    'FzfPreviewLinesRpc',
+    'FzfPreviewCtagsRpc',
+    'FzfPreviewBufferTagsRpc',
+    'FzfPreviewFromResourcesRpc',
+]
+hook_add = '''
 
+"最近使ったファイル+project
+nnoremap <silent> <C-B> :FzfPreviewFromResourcesRpc buffer project_mru git<CR>
+inoremap <silent> <C-B> <ESC>:FzfPreviewFromResourcesRpc buffer project_mru git<CR>
 
-    "バッファ一覧
-    autocmd FileType denite call s:denite_my_settings()
-    function! s:denite_my_settings() abort
-      nnoremap <silent><buffer><expr> <CR>
-      \ denite#do_map('do_action')
-      nnoremap <silent><buffer><expr> p
-      \ denite#do_map('do_action', 'preview')
-      nnoremap <silent><buffer><expr> <esc>
-      \ denite#do_map('quit')
-      nnoremap <silent><buffer><expr> i
-      \ denite#do_map('open_filter_buffer')
-      nnoremap <silent><buffer><expr> <Space>
-      \ denite#do_map('toggle_select').'j'
-    endfunction
+"バッファ,プロジェクト内のファイル
+nnoremap <silent> <C-P> :FzfPreviewProjectFilesRpc<CR>
+
+"バッファ一覧
+nnoremap <Leader>fb :FzfPreviewBuffersRpc<CR>
+
+" AG
+nnoremap <Leader>fg :FzfPreviewProjectGrepRpc<Space>
+
+let g:fzf_preview_directory_files_command="rg --files --hidden --glob !.git/** --color always"
 
 '''
+
+
+#[[plugins]] # denite
+#repo = 'Shougo/denite.nvim'
+#hook_add = '''
+#    "ESCキーでdeniteを終了（できなくなった？）
+#    "call denite#custom#map('insert', '<esc>', '<denite:enter_mode:normal>', 'noremap')
+#    "call denite#custom#map('normal', '<esc>', '<denite:quit>', 'noremap')
+#
+#    "rgあれば使う
+#    if executable('rg')
+#      call denite#custom#var('file_rec', 'command',
+#        \ ['rg', '--files', '--glob', '!.git', '--color', 'always'])
+#      call denite#custom#var('grep', 'command', ['rg'])
+#      call denite#custom#var('grep', 'recursive_opts', [])
+#      call denite#custom#var('grep', 'final_opts', [])
+#      call denite#custom#var('grep', 'separator', ['--'])
+#      call denite#custom#var('grep', 'default_opts', ['--vimgrep', '--no-heading'])
+#    endif
+#
+#    "file/recの除外ファイル設定
+#    call denite#custom#source('file/rec', 'matchers', ['matcher_fuzzy','matcher_ignore_globs'])
+#    call denite#custom#filter('matcher_ignore_globs', 'ignore_globs',
+#      \ [
+#      \ '.git/', 'build/', '__pycache__/', 'node_modules/', '.mypy_cache/', '.venv/', 'venvs/',
+#      \ 'images/', '*.o', '*.make',
+#      \ '*.min.*',
+#      \ 'img/', 'fonts/', 'tmp/'])
+#
+#    "neomruをプロジェクト内に絞る設定
+#    call denite#custom#source(
+#      \ 'file_mru', 'matchers',
+#      \ ['matcher_project_files', 'matcher_fuzzy'])
+#
+#    "バッファ,最近使ったファイル,プロジェクト内のファイル全部のせ
+#    noremap <C-B> :DeniteProjectDir -start-filter buffer file_mru file/rec<CR>
+#    inoremap <C-B> <ESC>:DeniteProjectDir -start-filter buffer file_mru file/rec<CR>
+#
+#    "バッファ,プロジェクト内のファイル
+#    noremap <C-P> :DeniteProjectDir -start-filter buffer file/rec<CR>
+#
+#    "バッファ一覧
+#    noremap <Leader>ub :Denite buffer<CR>
+#
+#    "最近使ったファイルの一覧
+#    noremap <Leader>um :Denite file_mru<CR>
+#
+#    "カレントディレクトリ
+#    noremap <Leader>uf :DeniteBufferDir file/rec<CR>
+#
+#    " Denige grep
+#    nnoremap <silent><Leader>ug :Denite grep -buffer-name=search-buffer-denite<CR>
+#    " Denite grep検索結果を再表示する
+#    nnoremap <silent><Leader>ugr :<C-u>Denite -resume -buffer-name=search-buffer-denite<CR>
+#    " resumeした検索結果の次の行の結果へ飛ぶ
+#    "nnoremap <silent><Leader>ugn :<C-u>Denite -resume -buffer-name=search-buffer-denite -select=+1 -immediately<CR>
+#    " resumeした検索結果の前の行の結果へ飛ぶ
+#    "nnoremap <silent><Leader>ugp :<C-u>Denite -resume -buffer-name=search-buffer-denite -select=-1 -immediately<CR>
+#
+#    " Notes
+#    " ノートの一覧
+#    command! -nargs=? Noteslist call Noteslist(<f-args>)
+#    function! Noteslist(...)
+#      if a:0 >= 1
+#        if a:1 == 'memo'
+#          :Denite -start-filter -path=~/notes/memo file/rec
+#        endif
+#        if a:1 == 'clients'
+#          :Denite -start-filter -path=~/notes/clients file/rec
+#        endif
+#      else
+#        :Denite -start-filter -path=~/notes/ file/rec
+#      endif
+#    endfunction
+#
+#    " ノートの検索
+#    command! -nargs=? Notesgrep call Notesgrep(<f-args>)
+#    function! Notesgrep(...)
+#      if a:0 >= 1
+#        if a:1 == 'memo'
+#          :Denite grep -path=~/notes/memo -buffer-name=search-buffer-denite
+#        endif
+#        if a:1 == 'clients'
+#          :Denite grep -path=~/notes/clients -buffer-name=search-buffer-denite
+#        endif
+#      else
+#        " :Denite grep -path=~/notes/ -buffer-name=search-buffer-denite
+#        :Denite grep -path=~/notes/
+#      endif
+#    endfunction
+#
+#    " ノート作成
+#    command! Notesadd :term notesadd
+#
+#    " メモ作成
+#    command! -nargs=? Notesmemo call Notesmemo(<f-args>)
+#    function! Notesmemo(...)
+#      if a:0 >= 1
+#         exe("term notesmemo " . a:1)
+#      else
+#        :term notesmemo
+#      endif
+#    endfunction
+#
+#    " 今日の日記作成
+#    command! Notesdiary :term notesdiary
+#
+#    " TODO検索
+#    command! Notestodo :Denite grep:::'\[\s\]'
+#
+#
+#    "バッファ一覧
+#    autocmd FileType denite call s:denite_my_settings()
+#    function! s:denite_my_settings() abort
+#      nnoremap <silent><buffer><expr> <CR>
+#      \ denite#do_map('do_action')
+#      nnoremap <silent><buffer><expr> p
+#      \ denite#do_map('do_action', 'preview')
+#      nnoremap <silent><buffer><expr> <esc>
+#      \ denite#do_map('quit')
+#      nnoremap <silent><buffer><expr> i
+#      \ denite#do_map('open_filter_buffer')
+#      nnoremap <silent><buffer><expr> <Space>
+#      \ denite#do_map('toggle_select').'j'
+#    endfunction
+#
+#'''
 
 #[[plugins]] # NerdTree
 #repo = 'scrooloose/nerdtree'
