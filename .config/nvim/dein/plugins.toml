@@ -231,8 +231,8 @@ function! s:useful_files(directory)
   let buffer = s:get_file_buffer_list()
   let history = s:file_history_from_directory(a:directory)
   let files = split(system('git ls-files'), "\n")
-  let l = fzf#vim#_uniq(buffer + history + files)
-  return fzf#vim#_uniq(buffer + history + files)
+  let buffer_git_only = filter(copy(buffer), 'index(files, v:val) != -1')
+  return fzf#vim#_uniq(buffer_git_only + history + files)
 endfunction
 
 function! s:file_history_from_directory(directory)
@@ -259,6 +259,23 @@ endfunction
 function! s:get_file_buffer_list()
   return filter(map(range(1, bufnr('$')), 'bufname(v:val)'), 'v:val != ""')
 endfunction
+
+""""""""""""""""
+" キーバインド
+""""""""""""""""
+" よく使う全部乗せ
+nnoremap <silent> <C-B> :ProjectUsefulFiles<CR>
+inoremap <silent> <C-B> <ESC>:ProjectUsefulFiles<CR>
+
+" プロジェクト内のファイル
+nnoremap <silent> <C-P> :ProjectFiles<CR>
+
+"バッファ一覧
+" nnoremap <Leader>fb :FzfPreviewBuffersRpc<CR>
+
+" AG
+nnoremap <Leader>fg :ProjectGrep<Space>
+
 
 " ノートの一覧
 command! Nlist execute 'Files ~/notes'
@@ -387,19 +404,19 @@ on_cmd = [
 hook_add = '''
 
 "最近使ったファイル+project
-nnoremap <silent> <C-B> :FzfPreviewFromResourcesRpc buffer project_mru git<CR>
-inoremap <silent> <C-B> <ESC>:FzfPreviewFromResourcesRpc buffer project_mru git<CR>
+"nnoremap <silent> <C-B> :FzfPreviewFromResourcesRpc buffer project_mru git<CR>
+"inoremap <silent> <C-B> <ESC>:FzfPreviewFromResourcesRpc buffer project_mru git<CR>
 
 "バッファ,プロジェクト内のファイル
-nnoremap <silent> <C-P> :FzfPreviewProjectFilesRpc<CR>
+"nnoremap <silent> <C-P> :FzfPreviewProjectFilesRpc<CR>
 
 "バッファ一覧
-nnoremap <Leader>fb :FzfPreviewBuffersRpc<CR>
+"nnoremap <Leader>fb :FzfPreviewBuffersRpc<CR>
 
 " AG
-nnoremap <Leader>fg :FzfPreviewProjectGrepRpc<Space>
+"nnoremap <Leader>fg :FzfPreviewProjectGrepRpc<Space>
 
-let g:fzf_preview_directory_files_command="rg --files --hidden --glob !.git/** --color always"
+"let g:fzf_preview_directory_files_command="rg --files --hidden --glob !.git/** --color always"
 
 '''
 
