@@ -230,9 +230,17 @@ command! -bang ProjectUsefulFiles call fzf#run(fzf#wrap(s:preview(<bang>0, {
 function! s:useful_files(directory)
   let buffer = s:get_file_buffer_list()
   let history = s:file_history_from_directory(a:directory)
-  let files = split(system('git ls-files'), "\n")
-  let buffer_git_only = filter(copy(buffer), 'index(files, v:val) != -1')
-  return fzf#vim#_uniq(buffer_git_only + history + files)
+  let files_all = split(globpath(a:directory, '*'), "\n")
+
+  if system('git rev-parse --is-inside-work-tree') == "true\n"
+    let buffer2 = filter(copy(buffer), 'index(files_all, v:val) != -1')
+    "let history2 = filter(copy(history), 'index(files_all, v:val) != -1')
+    let files_git = split(system('git ls-files'), "\n")
+    return fzf#vim#_uniq(buffer2 + history + files_git)
+  else
+    return fzf#vim#_uniq(buffer + history + files_all)
+  endif
+
 endfunction
 
 function! s:file_history_from_directory(directory)
