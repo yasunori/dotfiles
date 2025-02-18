@@ -50,6 +50,45 @@ function! GitMakeBranchAndMove()
   "call ConfirmActionAndExec(exec)
   execute exec
 endfunction
+
+" URLを取得する
+" .vimrc に追加してください！
+function! s:GetGitUrl() abort
+  " Git URLを取得します
+  let l:git_url = system('git config --get remote.origin.url')
+  
+  if v:shell_error != 0
+
+    echohl ErrorMsg
+    echo 'Git URLの取得に失敗しちゃいました...'
+    echohl None
+    return
+  endif
+  
+  " URLの変換処理
+  " .gitと改行を削除
+  let l:git_url = substitute(l:git_url, '\.git\n\?$', '', '')
+  " SSH形式をHTTPS形式に変換
+  let l:git_url = substitute(l:git_url, '^git@github\.com:', 'https://github.com/', '')
+  
+  " 現在のブランチ名を取得
+  let l:current_branch = system('git rev-parse --abbrev-ref HEAD')
+
+  let l:current_branch = substitute(l:current_branch, '\n\?$', '', '')
+  
+  " 結果を表示！
+echo '=== Repository URL ==='
+  echo l:git_url
+  echo ''
+  echo '=== Compare URL ==='
+  echo l:git_url . '/compare/develop...' . l:current_branch
+endfunction
+
+" コマンドとして登録
+command! GitUrl call s:GetGitUrl()
+
+" キーマッピングの設定例
+nnoremap <Leader>gu :GitUrl<CR>
 '''
 
 # コミットブラウザ
@@ -76,8 +115,8 @@ hook_add = '''
 " キーをいったん削除
 let g:gitgutter_map_keys = 0
 "" git操作
-nnoremap g[ <Plug>(GitGutterPrevHunk)
-nnoremap g] <Plug>(GitGutterNextHunk)
+nnoremap <Leader>h[ <Plug>(GitGutterPrevHunk)
+nnoremap <Leader>h] <Plug>(GitGutterNextHunk)
 nnoremap <Leader>hh :GitGutterLineHighlightsToggle<CR>
 nnoremap <Leader>hs <Plug>(GitGutterStageHunk)
 nnoremap <Leader>hu <Plug>(GitGutterUndoHunk)
