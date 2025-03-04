@@ -436,179 +436,6 @@ endfunction
   endfunction
 '''
 
-[[plugins]]
-repo = 'yuki-yano/fzf-preview.vim'
-rev = 'release/rpc'
-on_cmd = [
-    'FzfPreviewFromResourcesRpc',
-    'FzfPreviewGitStatusRpc',
-    'FzfPreviewBuffersRpc',
-    'FzfPreviewLinesRpc',
-    'FzfPreviewCtagsRpc',
-    'FzfPreviewBufferTagsRpc',
-    'FzfPreviewFromResourcesRpc',
-]
-hook_add = '''
-
-"最近使ったファイル+project
-"nnoremap <silent> <C-B> :FzfPreviewFromResourcesRpc buffer project_mru git<CR>
-"inoremap <silent> <C-B> <ESC>:FzfPreviewFromResourcesRpc buffer project_mru git<CR>
-
-"バッファ,プロジェクト内のファイル
-"nnoremap <silent> <C-P> :FzfPreviewProjectFilesRpc<CR>
-
-"バッファ一覧
-"nnoremap <Leader>fb :FzfPreviewBuffersRpc<CR>
-
-" AG
-"nnoremap <Leader>fg :FzfPreviewProjectGrepRpc<Space>
-
-"let g:fzf_preview_directory_files_command="rg --files --hidden --glob !.git/** --color always"
-
-'''
-
-
-#[[plugins]] # denite
-#repo = 'Shougo/denite.nvim'
-#hook_add = '''
-#    "ESCキーでdeniteを終了（できなくなった？）
-#    "call denite#custom#map('insert', '<esc>', '<denite:enter_mode:normal>', 'noremap')
-#    "call denite#custom#map('normal', '<esc>', '<denite:quit>', 'noremap')
-#
-#    "rgあれば使う
-#    if executable('rg')
-#      call denite#custom#var('file_rec', 'command',
-#        \ ['rg', '--files', '--glob', '!.git', '--color', 'always'])
-#      call denite#custom#var('grep', 'command', ['rg'])
-#      call denite#custom#var('grep', 'recursive_opts', [])
-#      call denite#custom#var('grep', 'final_opts', [])
-#      call denite#custom#var('grep', 'separator', ['--'])
-#      call denite#custom#var('grep', 'default_opts', ['--vimgrep', '--no-heading'])
-#    endif
-#
-#    "file/recの除外ファイル設定
-#    call denite#custom#source('file/rec', 'matchers', ['matcher_fuzzy','matcher_ignore_globs'])
-#    call denite#custom#filter('matcher_ignore_globs', 'ignore_globs',
-#      \ [
-#      \ '.git/', 'build/', '__pycache__/', 'node_modules/', '.mypy_cache/', '.venv/', 'venvs/',
-#      \ 'images/', '*.o', '*.make',
-#      \ '*.min.*',
-#      \ 'img/', 'fonts/', 'tmp/'])
-#
-#    "neomruをプロジェクト内に絞る設定
-#    call denite#custom#source(
-#      \ 'file_mru', 'matchers',
-#      \ ['matcher_project_files', 'matcher_fuzzy'])
-#
-#    "バッファ,最近使ったファイル,プロジェクト内のファイル全部のせ
-#    noremap <C-B> :DeniteProjectDir -start-filter buffer file_mru file/rec<CR>
-#    inoremap <C-B> <ESC>:DeniteProjectDir -start-filter buffer file_mru file/rec<CR>
-#
-#    "バッファ,プロジェクト内のファイル
-#    noremap <C-P> :DeniteProjectDir -start-filter buffer file/rec<CR>
-#
-#    "バッファ一覧
-#    noremap <Leader>ub :Denite buffer<CR>
-#
-#    "最近使ったファイルの一覧
-#    noremap <Leader>um :Denite file_mru<CR>
-#
-#    "カレントディレクトリ
-#    noremap <Leader>uf :DeniteBufferDir file/rec<CR>
-#
-#    " Denige grep
-#    nnoremap <silent><Leader>ug :Denite grep -buffer-name=search-buffer-denite<CR>
-#    " Denite grep検索結果を再表示する
-#    nnoremap <silent><Leader>ugr :<C-u>Denite -resume -buffer-name=search-buffer-denite<CR>
-#    " resumeした検索結果の次の行の結果へ飛ぶ
-#    "nnoremap <silent><Leader>ugn :<C-u>Denite -resume -buffer-name=search-buffer-denite -select=+1 -immediately<CR>
-#    " resumeした検索結果の前の行の結果へ飛ぶ
-#    "nnoremap <silent><Leader>ugp :<C-u>Denite -resume -buffer-name=search-buffer-denite -select=-1 -immediately<CR>
-#
-#    " Notes
-#    " ノートの一覧
-#    command! -nargs=? Noteslist call Noteslist(<f-args>)
-#    function! Noteslist(...)
-#      if a:0 >= 1
-#        if a:1 == 'memo'
-#          :Denite -start-filter -path=~/notes/memo file/rec
-#        endif
-#        if a:1 == 'clients'
-#          :Denite -start-filter -path=~/notes/clients file/rec
-#        endif
-#      else
-#        :Denite -start-filter -path=~/notes/ file/rec
-#      endif
-#    endfunction
-#
-#    " ノートの検索
-#    command! -nargs=? Notesgrep call Notesgrep(<f-args>)
-#    function! Notesgrep(...)
-#      if a:0 >= 1
-#        if a:1 == 'memo'
-#          :Denite grep -path=~/notes/memo -buffer-name=search-buffer-denite
-#        endif
-#        if a:1 == 'clients'
-#          :Denite grep -path=~/notes/clients -buffer-name=search-buffer-denite
-#        endif
-#      else
-#        " :Denite grep -path=~/notes/ -buffer-name=search-buffer-denite
-#        :Denite grep -path=~/notes/
-#      endif
-#    endfunction
-#
-#    " ノート作成
-#    command! Notesadd :term notesadd
-#
-#    " メモ作成
-#    command! -nargs=? Notesmemo call Notesmemo(<f-args>)
-#    function! Notesmemo(...)
-#      if a:0 >= 1
-#         exe("term notesmemo " . a:1)
-#      else
-#        :term notesmemo
-#      endif
-#    endfunction
-#
-#    " 今日の日記作成
-#    command! Notesdiary :term notesdiary
-#
-#    " TODO検索
-#    command! Notestodo :Denite grep:::'\[\s\]'
-#
-#
-#    "バッファ一覧
-#    autocmd FileType denite call s:denite_my_settings()
-#    function! s:denite_my_settings() abort
-#      nnoremap <silent><buffer><expr> <CR>
-#      \ denite#do_map('do_action')
-#      nnoremap <silent><buffer><expr> p
-#      \ denite#do_map('do_action', 'preview')
-#      nnoremap <silent><buffer><expr> <esc>
-#      \ denite#do_map('quit')
-#      nnoremap <silent><buffer><expr> i
-#      \ denite#do_map('open_filter_buffer')
-#      nnoremap <silent><buffer><expr> <Space>
-#      \ denite#do_map('toggle_select').'j'
-#    endfunction
-#
-#'''
-
-#[[plugins]] # NerdTree
-#repo = 'scrooloose/nerdtree'
-# hook_add = '''
-#    noremap nt :NERDTreeToggle<CR>
-#    let file_name = expand("%")
-#	let NERDTreeShowHidden = 1
-#    let g:NERDTreeWinSize=26
-#    "if has('vim_starting') &&  file_name == ""
-#    "    autocmd VimEnter * NERDTree ./
-#    "endif
-#'''
-
-#[[plugins]]
-#repo = 'Xuyuanp/nerdtree-git-plugin'
-
 
 [[plugins]]
 repo = 'lambdalisue/fern.vim'
@@ -699,8 +526,6 @@ let g:buftabline_numbers = 2
 "highlight BufTabLineHidden guifg=#89898c ctermfg=245 guibg=#3e3e40 ctermbg=236 gui=NONE cterm=NONE
 "highlight BufTabLineFill guifg=NONE ctermfg=NONE guibg=#252527 ctermbg=235 gui=NONE cterm=NONE
 
-"nnoremap <Leader>l :bnext<CR>
-"nnoremap <Leader>h :bprev<CR>
 nnoremap <C-l> :bnext<CR>
 nnoremap <C-h> :bprev<CR>
 nnoremap <Leader>x :bd<CR>
@@ -775,21 +600,6 @@ hook_add = """
 
 [[plugins]] # :%S で/perl風正規表現
 repo = 'othree/eregex.vim'
-
-# [[plugins]] # バレットのTABインデント、Leader2回でチェックボックスのトグル
-# repo = "yasunori/iikanji-markdown.vim"
-# hook_add = """
-#     let g:iikanji#markdown#mapping#toggle_checkbox="<Leader>x"
-#     let g:iikanji#markdown#use_indent_with_tab="1"
-#    let g:iikanji#markdown#use_abbrev="0"
-#    let g:iikanji#markdown#abbrev={}
-#    noremap  <silent><buffer> <Leader><Tab> :call iikanji#markdown#indent_with_tab(1)<CR>
-#    noremap  <silent><buffer> <Leader><S-Tab> :call iikanji#markdown#indent_with_tab(-1)<CR>
-#    inoremap <silent><buffer> <Leader><Tab> <C-o>:call iikanji#markdown#indent_with_tab(1)<CR>
-#    inoremap <silent><buffer> <Leader><S-Tab> <C-o>:call iikanji#markdown#indent_with_tab(-1)<CR>
-#    vnoremap <silent><buffer> <Leader><Tab> :call iikanji#markdown#indent_with_tab(1)<CR>
-#    vnoremap <silent><buffer> <Leader><S-Tab> :call iikanji#markdown#indent_with_tab(-1)<CR>
-#"""
 
 [[plugins]]
 repo = 'mattn/vim-sonictemplate'
@@ -936,6 +746,7 @@ hook_add = """
 """
 
 [[plugins]]
+# Term とか VTerm とかで terminal を開くのに使う
 repo = 'vimlab/split-term.vim'
 hook_add = """
     set splitright

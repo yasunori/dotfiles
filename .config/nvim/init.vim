@@ -15,7 +15,8 @@ function! WinClip() abort
     if system('uname -a | grep microsoft') != ''
         augroup myYank
             autocmd!
-            autocmd TextYankPost * :call system('clip.exe', @")
+            "autocmd TextYankPost * :call system('clip.exe', @")
+            autocmd TextYankPost * call system('iconv -f utf-8 -t utf-16le | clip.exe', @")
         augroup END
     endif
 endfunction
@@ -121,6 +122,9 @@ nnoremap k gk
 "C-xで入れられる
 cnoremap <C-x> <C-r>=expand('%:p:h')<CR>/
 
+" いまのパスをクリップボードに
+command! YankFilename let @" = expand('%')
+
 "format.vimの設定
 "format_join_spaceについて。連結の際、スペースが挿入されるかどうか。
 "行末と次の行頭が……
@@ -165,14 +169,14 @@ function! ToggleTerminal()
     " If the current buffer is not a terminal, try to find the terminal buffer
     if bufexists(g:terminal_bufnr)
       " If the terminal buffer exists, switch to it
-      execute 'split'
+      execute 'vsplit'
       execute "buffer " . g:terminal_bufnr
       execute "normal i"
 
     else
       " If no terminal buffer exists, create a new one and save its buffer number
       " terminal
-      Term
+      VTerm
       let g:terminal_bufnr = bufnr('%')
     endif
 
@@ -227,3 +231,54 @@ function! ConfirmActionAndExec(commandStr)
     echo "Cancelled."
   endif
 endfunction
+
+" プロジェクトルートからの相対パスを表示する関数
+function! GetRelativePathFromRoot()
+  " プロジェクトルートを検出するための一般的なマーカーファイル
+  let l:markers = ['.git', '.svn', '.hg', 'package.json', 'Cargo.toml', 'go.mod']
+  
+  " 現在のファイルのフルパスを取得
+  let l:current_file = expand('%:p')
+  let l:current_dir = fnamemodify(l:current_file, ':h')
+  
+  " ルートディレクトリを見つける
+  let l:root_dir = ''
+  let l:check_dir = l:current_dir
+  
+  while l:check_dir != '/'
+    for l:marker in l:markers
+      if filereadable(l:check_dir . '/' . l:marker) || isdirectory(l:check_dir . '/' . l:marker)
+        let l:root_dir = l:check_dir
+        break
+      endif
+    endfor
+    
+    if !empty(l:root_dir)
+      break
+    endif
+    
+    " 親ディレクトリに移動
+    let l:check_dir = fnamemodify(l:check_dir, ':h')
+  endwhile
+  
+  " ルートが見つからない場合は現在のファイル名を返す
+  if empty(l:root_dir)
+    return expand('%')
+  endif
+  
+  " ルートからの相対パスを計算
+  let l:relative_path = strpart(l:current_file, strlen(l:root_dir) + 1)
+  
+  return l:relative_path
+endfunction
+
+" ステータスラインに表示する場合の例
+function! SetRelativePathInStatusLine()
+  set statusline=%{GetRelativePathFromRoot()}\ %h%m%r%=%-14.(%l,%c%V%)\ %P
+endfunction
+
+" コマンドとして使用する例
+command! ShowRelativePath echo GetRelativePathFromRoot()
+
+" マッピングの例 (F2キーで相対パスを表示)
+nnoremap <F2> :ShowRelativePath<CR>
