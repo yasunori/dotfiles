@@ -117,6 +117,11 @@ nnoremap k gk
 
 " 補完
 " set completeopt=menuone,noinsert
+" cocとかぶるのでコメントアウト
+" 矢印キーで補完候補選択を、ctrl+n/pで補完候補選択と同じ動作をする
+inoremap <expr><Down> pumvisible() ? "<C-n>" : "<Down>"
+inoremap <expr><Up> pumvisible() ? "<C-p>" : "<Up>"
+"
 
 "コマンドラインで、カレントディレクトリを入れよう
 "C-xで入れられる
