@@ -7,6 +7,9 @@ windows:
     shell_command_before:
       - tmux source ~/.tmux.base.conf 
       - cd ~/notes/
+  - window_name: vifm
+    shell_command_before:
+      - vifm
   - window_name: dev
     shell_command_before:
       - ssh dev

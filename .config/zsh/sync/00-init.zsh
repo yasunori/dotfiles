@@ -227,6 +227,11 @@ alias ccat='ccat -G String="_brown_" -G Plaintext="lightgrey" -G Punctuation="da
 # 共通のツール設定
 ########################################
 
+# linuxbrew
+if [[ -e ~/.linuxbrew ]]; then
+    export PATH=$HOME/.linuxbrew/bin:$HOME/.linuxbrew/sbin:$PATH
+fi
+
 # dotfiles/bin
 if [[ -e ~/dotfiles/bin ]]; then
     export PATH=$HOME/dotfiles/bin:$PATH
@@ -343,11 +348,6 @@ case ${OSTYPE} in
             export VISUAL=$HOME/.linuxbrew/bin/nvim
         fi
 
-        # linuxbrew
-        if [[ -e ~/.linuxbrew ]]; then
-            export PATH=$HOME/.linuxbrew/bin:$HOME/.linuxbrew/sbin:$PATH
-        fi
-
         # tmuxで256色使えない問題
         alias tmux='tmux -2'
 
@@ -374,3 +374,12 @@ esac
 export FZF_DEFAULT_COMMAND='rg --files --hidden --glob "!.git"'
 #export FZF_DEFAULT_OPTS='--height 40% --reverse'
 export FZF_DEFAULT_OPTS='--color=fg+:11 --height 70% --reverse --exit-0 --multi --bind=ctrl-a:toggle-all --ansi --preview-window noborder'
+
+# vifm with cd
+function vf() {
+    local dst="$(command vifm $1 $2 --choose-dir -)"
+    if [ -z "$dst" ]; then
+        return 1
+    fi
+    cd "$dst"
+}

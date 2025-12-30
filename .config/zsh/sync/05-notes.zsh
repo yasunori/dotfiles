@@ -26,15 +26,15 @@ function notesnew() {
     if [ -n "$1" ]; then
         category=$1
     else
-        echo -n category?:
-        read category
+        echo "category?:"
+        vared category
     fi
 
     if [ -n "$2" ]; then
         f=$2
     else
-        echo -n filename?:
-        read f
+        echo "filename?:"
+        vared f
     fi
 
     # filenameに日付を補完する
@@ -200,8 +200,8 @@ function notesmove() {
         new_category=$1
         echo "new_category?: $new_category"
     else
-        echo -n new category?:
-        read new_category
+        echo new category?:
+        vared new_category
     fi
 
     filefullpath=$(notes ls | fzf)
@@ -330,11 +330,25 @@ function notesmemo() {
     if [ -n "$1" ]; then
         file=$1
     else
-        echo -n filename?:
-        read file
+        echo filename?:
+        vared file
     fi
     notesnew memo $file
 }
+
+
+# 技術メモ
+function notestech() {
+    local file 
+    if [ -n "$1" ]; then
+        file=$1
+    else
+        echo filename?:
+        vared file
+    fi
+    notesnew tech $file
+}
+
 
 # チェックのついていないチェックボックスを検索
 function notestodo() {
@@ -366,7 +380,8 @@ function n() {
             "grep" ) notesgrep ${@:2};;
             "add" ) notesnew $2 $3 $4;;
             "new" ) notesnew $2 $3 $4;;
-            "memo" ) notesmemo;;
+            "memo" ) notesmemo $2;;
+            "tech" ) notestech;;
             "diary" ) notesdiary;;
             "todo" ) notestodo;;
             "done" ) notesdone;;
