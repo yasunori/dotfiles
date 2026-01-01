@@ -1,0 +1,11 @@
+/mnt/c/Dropbox/
+/mnt/c/Dropbox/Downloads/
+/mnt/c/Dropbox/Photos/sanpoo_photo/sanpo/
+/mnt/c/Dropbox/Photos/sanpoo_photo/sanpo_resized/
+/mnt/c/Dropbox/Photos/sanpoo_photo/sanpo_webp/
+/mnt/c/Dropbox/Work/
+/mnt/c/Dropbox/Work/開発プロジェクト資料/
+/mnt/c/Dropbox/Work/事業関連/01_会計/
+/mnt/c/Dropbox/ssh-hosts/
+/mnt/c/
+/tmp/
